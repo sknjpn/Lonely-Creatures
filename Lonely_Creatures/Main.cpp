@@ -1,21 +1,33 @@
-﻿# include <Siv3D.hpp> // OpenSiv3D v0.1.6
+﻿#include"Unit.h"
+#include"Object.h"
+#include"Material.h"
+#include"TinyCamera.h"
+#include"Area.h"
 
 void Main()
 {
-	Graphics::SetBackground(ColorF(0.8, 0.9, 1.0));
+	Graphics::SetBackground(Palette::Skyblue);
 
-	const Font font(50);
+	Window::Resize(1280, 720);
 
-	const Texture textureCat(Emoji(L"🐈"), TextureDesc::Mipped);
+	initTinyCamera();
+	initUnits();
+	initAreas();
+	initMaterials();
 
 	while (System::Update())
 	{
-		font(L"Hello, Siv3D!🐣").drawAt(Window::Center(), Palette::Black);
+		tinyCamera.update();
+		{
+			auto t = tinyCamera.createTransformer();
+			updateMaterials();
+			updateObjects();
+			updateUnits();
 
-		font(Cursor::Pos()).draw(20, 400, ColorF(0.6));
-
-		textureCat.resize(80).draw(540, 380);
-
-		Circle(Cursor::Pos(), 60).draw(ColorF(1, 0, 0, 0.5));
+			drawAreas();
+			drawMaterials();
+			drawObjects();
+			drawUnits();
+		}
 	}
 }
