@@ -11,3 +11,4 @@ Array<Material>	materials;
 Grid<Area>		areas;
 double	areaWidth = 64.0;
 Vec2	areaSize = { 1024, 1024 };
+int	numMaterialTypes = 2;

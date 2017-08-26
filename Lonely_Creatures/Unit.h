@@ -17,11 +17,12 @@ struct Unit
 	int		unitType;
 	Vec2	pos;
 	Vec2	angle;
+	Vec2	v;
 	Area*	joinedArea;
 	int		age;
-	double	m0;
-	double	m1;
+	Array<double>	ownMaterials;
 	State	state;
+	double	health;
 
 
 	Unit() { reset(); }
@@ -30,13 +31,16 @@ struct Unit
 	void	reset();
 	int		id() const;
 	void	joinArea();
-	Point	getAreaPos() const;
 	void	erase();
+	void	die();
+	Unit*	makeChild();
+	Unit*	newUnit();
 };
 
 extern Array<Unit> units;
+extern Array<Texture>	textures;
+
 
 void	updateUnits();
 void	drawUnits();
 void	initUnits();
-Unit*	newUnit();

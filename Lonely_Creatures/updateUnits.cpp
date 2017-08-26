@@ -49,85 +49,211 @@ void	Unit::updateCreamatis()
 		}
 		break;
 	case State::Larva:
-		if (m0 <= 1.0)
-		{
-			auto* m = nearestMaterial(pos, 0);
-			if (m != nullptr && (m->pos - pos).length() < 32.0)
-			{
-				if (m->n > 1.0)
-				{
-					m0 += 1.0;
-					m->n -= 1.0;
-				}
-				else
-				{
-					m0 += m->n;
-					m->n = 0;
-					m->erase();
-				}
-			}
-		}
 
-		if (m0 >= 0.1)
+		//マテリアル回収
+		for (;;)
 		{
-			m1 += 0.1;
-			m0 -= 0.1;
-		}
-		else
-		{
-			m1 += m0;
-			m0 = 0;
-			if (m1 > 0) setMaterial(0, m1, pos, 2);
-			erase();
-			return;
-		}
-
-		if (age > 60)
-		{
-			for (int i = 0; i < 2; i++)
+			const double r = 0.1;
+			if (ownMaterials[0] <= r)
 			{
-				auto* nu = newUnit();
-				if (nu != nullptr)
+				auto* m = nearestMaterial(pos, 0);
+				if (m != nullptr && (m->pos - pos).length() < 32.0)
 				{
-					nu->enabled = true;
-					nu->angle = RandomVec2();
-					nu->pos = pos + RandomVec2(32);
-					nu->unitType = unitType;
-					nu->age = Random(-120, 0);
-					if (nu->pos.x < 0) nu->pos.x = 0;
-					if (nu->pos.y < 0) nu->pos.y = 0;
-					if (nu->pos.x > 1024) nu->pos.x = 1024;
-					if (nu->pos.y > 1024) nu->pos.y = 1024;
-				}
-			}
-			if (m0 > 0) setMaterial(0, m0, pos, 2);
-			if (m1 > 0)
-			{
-				double s = 2.0;
-				for (;;)
-				{
-					if (m1 > s)
+					if (m->n > r)
 					{
-						setMaterial(1, s, pos, 2);
-						m1 -= s;
+						ownMaterials[0] += r;
+						m->n -= r;
 					}
 					else
 					{
-						setMaterial(1, m1, pos, 2);
-						break;
+						ownMaterials[0] += m->n;
+						m->n = 0;
+						m->erase();
 					}
 				}
-
+				else break;
 			}
-			erase();
+			else break;
+		}
+
+		//マテリアル変換
+		if (ownMaterials[0] >= 0.01)
+		{
+			ownMaterials[1] += 0.01;
+			ownMaterials[0] -= 0.01;
+		}
+		else	//マテリアル不足の場合、死亡
+		{
+			die();
+			return;
+		}
+
+		if (age > 300)
+		{
+			age = 0;
+			state = State::Imago;
+		}
+		break;
+	case  State::Imago:
+
+		//マテリアル回収
+		for (;;)
+		{
+			const double r = 0.1;
+			if (ownMaterials[0] <= r)
+			{
+				auto* m = nearestMaterial(pos, 0);
+				if (m != nullptr && (m->pos - pos).length() < 32.0)
+				{
+					if (m->n > r)
+					{
+						ownMaterials[0] += r;
+						m->n -= r;
+					}
+					else
+					{
+						ownMaterials[0] += m->n;
+						m->n = 0;
+						m->erase();
+					}
+				}
+				else break;
+			}
+			else break;
+		}
+
+		//マテリアル変換
+		if (ownMaterials[0] >= 0.01)
+		{
+			ownMaterials[1] += 0.01;
+			ownMaterials[0] -= 0.01;
+		}
+		else	//マテリアル不足の場合、死亡
+		{
+			die();
+			return;
+		}
+
+		if (age > 150)
+		{
+			//子孫を残す
+			for (int i = 0; i < 2; i++)
+			{
+				auto* nu = makeChild();
+				if (nu != nullptr) nu->v = RandomVec2(3);
+			}
+
+			die();
 			return;
 		}
 		break;
 	default:
 		break;
 	}
+	if (!v.isZero())
+	{
+		pos += v;
+		v *= 0.90;
+		if (pos.x < 0) pos.x = 0;
+		if (pos.y < 0) pos.y = 0;
+		if (pos.x > 1024) pos.x = 1024;
+		if (pos.y > 1024) pos.y = 1024;
+	}
 }
 void	Unit::updateSlug()
 {
+	switch (state)
+	{
+	case State::Egg:
+		if (age > 600)
+		{
+			age = 0;
+			state = State::Larva;
+			health = 1.0;
+		}
+		break;
+	case State::Larva:
 
+		angle.rotate(sin(age / 5.0)*0.01);
+		{
+			auto* m = nearestMaterial(pos, 1);
+			if (m == nullptr || (m->pos - pos).length() >= 64.0 || ownMaterials[1] > 6.0)
+			{
+				v += angle*0.02;
+				angle.rotate(sin(age / 60.0)*0.05);
+			}
+			else if ((m->pos - pos).length() < 4.0)
+			{
+				const double r = 1.0;
+
+				if (m->n > r)
+				{
+					ownMaterials[1] += r;
+					m->n -= r;
+				}
+				else
+				{
+					ownMaterials[1] += m->n;
+					m->n = 0;
+					m->erase();
+				}
+			}
+			else
+			{
+				v += angle*0.02;
+				if ((m->pos - pos).cross(angle) > 0) angle.rotate(-0.05);
+				else angle.rotate(0.05);
+			}
+		}
+		//マテリアル変換
+		if (ownMaterials[1] >= 0.1)
+		{
+			ownMaterials[0] += 0.1;
+			ownMaterials[1] -= 0.1;
+
+			if (ownMaterials[0] > 1.0)
+			{
+				setMaterial(0, 1.0, pos, 0.0);
+				ownMaterials[0] -= 1.0;
+			}
+			health += 0.1;
+			if (health > 1.0) health = 1.0;
+		}
+		else	//マテリアル不足の場合、死亡
+		{
+			health -= 0.002;
+			if (health <= 0.0)
+			{
+				die();
+				return;
+			}
+		}
+
+		if (age > 1000)
+		{
+			//子孫を残す
+			for (int i = 0; i < 3; i++)
+			{
+				auto* nu = makeChild();
+				if (nu != nullptr)
+				{
+					nu->v = RandomVec2(3);
+					nu->age = Random(600);
+				}
+			}
+
+			die();
+			return;
+		}
+		break;
+	}
+	if (!v.isZero())
+	{
+		pos += v;
+		v *= 0.90;
+		if (pos.x < 0) pos.x = 0;
+		if (pos.y < 0) pos.y = 0;
+		if (pos.x > 1024) pos.x = 1024;
+		if (pos.y > 1024) pos.y = 1024;
+	}
 }

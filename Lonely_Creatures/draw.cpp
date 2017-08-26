@@ -44,36 +44,44 @@ void	drawUnits()
 			switch (u.unitType)
 			{
 			case 0:
-			{
-				double size = pow(u.m1, 0.5);
 				switch (u.state)
 				{
 				case State::Egg:
 					Circle(u.pos, 1).draw(Palette::Black);
-
 					break;
+
 				case State::Larva:
 				{
-					auto* m = nearestMaterial(u.pos, 0);
-					if (m != nullptr)
-					{
-						Line(m->pos, u.pos).draw(1, Color(Palette::Red, 64));
-					}
-					Circle(u.pos.movedBy(size, size), size * 1.5).draw(Palette::Green);
-					Circle(u.pos.movedBy(-size, size), size * 1.5).draw(Palette::Green);
-					Circle(u.pos.movedBy(size, -size), size * 1.5).draw(Palette::Green);
-					Circle(u.pos.movedBy(-size, -size), size * 1.5).draw(Palette::Green);
+					const double sizeLerf = EaseOut(Easing::Back, 0.0, 10.0, u.age / 300.0);
+					textures.at(0).resize(sizeLerf).drawAt(u.pos);
 				}
-					break;
-				default:
-					break;
-				}			}
-			break;
+				break;
+
+				case State::Imago:
+				{
+					const double sizeFlower = EaseOut(Easing::Back, 0.0, 4.0, u.age / 150.0);
+
+					textures.at(0).resize(10.0).drawAt(u.pos);
+					textures.at(1).resize(sizeFlower).drawAt(u.pos.movedBy(0, -1));
+				}
+				break;
+
+				}
+				break;
+
 			case 1:
-				Circle(u.pos, 3).draw(Palette::Brown);
+				switch (u.state)
+				{
+				case State::Egg:
+					Circle(u.pos, 1).draw(Palette::Black);
+					break;
+
+				case State::Larva:
+					textures.at(2).resize(4.0).rotate(atan2(u.angle.y, u.angle.x)).drawAt(u.pos);
+					break;
+				}
 				break;
-			default:
-				break;
+
 			}
 		}
 	}

@@ -20,3 +20,5 @@ extern Vec2		areaSize;
 
 void	drawAreas();
 void	initAreas();
+Point	getAreaPos(const Vec2& _pos);
+Area*	getArea(const Vec2& _pos);

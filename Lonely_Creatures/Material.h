@@ -13,12 +13,12 @@ struct Material
 
 	Material() {reset(); }
 	void	joinArea();
-	Point	getAreaPos() const;
 	void	erase();
 	void	reset();
 };
 
 extern Array<Material>	materials;
+extern int	numMaterialTypes;
 
 void	initMaterials();
 void	drawMaterials();

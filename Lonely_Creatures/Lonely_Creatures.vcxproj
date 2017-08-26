@@ -175,6 +175,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Area.cpp" />
     <ClCompile Include="draw.cpp" />
     <ClCompile Include="GlobalVariable.cpp" />
     <ClCompile Include="init.cpp" />

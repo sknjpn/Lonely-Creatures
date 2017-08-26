@@ -16,19 +16,30 @@ void	initObjects()
 void	initUnits()
 {
 	units.resize(4096);
+
 	for (int i = 0; i < 1024; i++)
 	{
 		auto& u = units[i];
 		u.enabled = true;
 		u.angle = RandomVec2();
-		u.age = i%60;
+		u.age = i % 60;
 		u.pos = RandomVec2(RectF(areaSize));
 		u.unitType = 0;
+	}
+	for (int i = 0; i < 128; i++)
+	{
+		auto& u = units[i];
+		u.enabled = true;
+		u.angle = RandomVec2();
+		u.age = i % 60;
+		u.pos = RandomVec2(RectF(areaSize));
+		u.unitType = 1;
 	}
 }
 void	initMaterials()
 {
 	materials.resize(4096);
+
 	for (int i = 0; i < 512; i++)
 	{
 		auto& m = materials[i];

@@ -3,12 +3,8 @@
 
 void	Material::joinArea()
 {
-	joinedArea = &areas.at(getAreaPos());
+	joinedArea = &areas.at(getAreaPos(pos));
 	joinedArea->materials.emplace_back(this);
-}
-Point	Material::getAreaPos() const
-{
-	return { int(pos.x / areaWidth),int(pos.y / areaWidth) };
 }
 void	Material::erase()
 {
@@ -29,6 +25,7 @@ Material*	newMaterial()
 	{
 		if (!m.enabled) return &m;
 	}
+	LOG_ERROR(L"Material Max");
 	return nullptr;
 }
 Material*	nearestMaterial(const Vec2& _pos, int _materialType)
@@ -40,7 +37,7 @@ Material*	nearestMaterial(const Vec2& _pos, int _materialType)
 	{
 		for (int y = Max(0, p.y - 1); y < Min(areas.size().y, p.y + 2); y++)
 		{
-			for (auto* m : areas[y][x].materials)
+			for (auto* m : areas.at(y, x).materials)
 			{
 				if (m->materialType == _materialType && (nearest == nullptr || nearest->pos.distanceFrom(_pos) > m->pos.distanceFrom(_pos)))
 				{
@@ -75,7 +72,7 @@ void	updateMaterials()
 			case 1:
 				for (int i = 0; i < m.n; i++)
 				{
-					if (RandomBool(0.01))
+					if (RandomBool(0.001))
 					{
 						double s = 2.0;
 						if (m.n > s)
@@ -90,17 +87,29 @@ void	updateMaterials()
 			default:
 				break;
 			}
-			if (m.joinedArea != nullptr)
+
+			if (!m.pos.isZero())
 			{
-				m.joinedArea->materials.remove(&m);
+				if (getArea(m.pos + m.v) != m.joinedArea)
+				{
+					if (m.joinedArea != nullptr) m.joinedArea->materials.remove(&m);
+					m.pos += m.v;
+					if (m.pos.x < 0) m.pos.x = 0;
+					if (m.pos.y < 0) m.pos.y = 0;
+					if (m.pos.x > 1024) m.pos.x = 1024;
+					if (m.pos.y > 1024) m.pos.y = 1024;
+					m.joinArea();
+				}
+				else
+				{
+					m.pos += m.v;
+					if (m.pos.x < 0) m.pos.x = 0;
+					if (m.pos.y < 0) m.pos.y = 0;
+					if (m.pos.x > 1024) m.pos.x = 1024;
+					if (m.pos.y > 1024) m.pos.y = 1024;
+				}
+				m.v *= 0.90;
 			}
-			m.pos += m.v;
-			if (m.pos.x < 0) m.pos.x = 0;
-			if (m.pos.y < 0) m.pos.y = 0;
-			if (m.pos.x > 1024) m.pos.x = 1024;
-			if (m.pos.y > 1024) m.pos.y = 1024;
-			m.joinArea();
-			m.v *= 0.90;
 		}
 	}
 }
