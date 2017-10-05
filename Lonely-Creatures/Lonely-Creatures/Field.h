@@ -36,18 +36,31 @@ public:
 			Criket,
 		};
 
-		Type	type;
+		enum struct State {
+			Child,
+			Adult,
+		};
+
+		enum struct Gender {
+			None,
+			Female,
+			Male,
+		};
+
 		int		age;
 		int		health;
+		Type	type;
+		State	state;
+		Gender	gender;
 
 		Creature(const Vec2& _pos, const Type& _type);
 
 		int	maxHealth() const {
 			switch (type)
 			{
-			case Type::Crematis:return 10;
-			case Type::Slug:	return 20;
-			case Type::Criket:	return 50;
+			case Type::Crematis:return 5;
+			case Type::Slug:	return 12;
+			case Type::Criket:	return 20;
 			default: return 100;
 			}
 		}
@@ -55,7 +68,9 @@ public:
 			switch (type)
 			{
 			case Type::Crematis:return 16.0;
-			case Type::Slug:	return 18.0;
+			case Type::Slug:
+				if (state == State::Adult) return 18.0;
+				else return 8.0;
 			case Type::Criket:	return 32.0;
 			default: return 16.0;
 			}
@@ -66,12 +81,13 @@ public:
 	struct Material : Object {
 
 		enum struct Type {
+			Leaf,
+			Meat,
 			Iron,
-			Copper,
-			Platinum,
 		};
 
 		Type	type;
+		int		age;
 
 		Material(const Vec2& _pos, const Type& _type);
 	};
@@ -121,6 +137,7 @@ public:
 			Point	minP(int((_pos.x - _range) / width), int((_pos.y - _range) / width));
 			Point	maxP(int((_pos.x + _range) / width), int((_pos.y + _range) / width));
 			double	max = 0.0;
+			double	rangeSq = _range*_range;
 			Creature*	target = nullptr;
 
 			for (int x = minP.x - 1; x <= maxP.x + 1; x++)
@@ -132,11 +149,14 @@ public:
 					const auto& c = chips.at(Point(x, y));
 					for (auto* cr : c.creatures)
 					{
-						double value = func(_pos, cr);
-						if (value > 0 && (value > max || target == nullptr))
+						if ((cr->pos - _pos).lengthSq() <= rangeSq)
 						{
-							target = cr;
-							max = value;
+							double value = func(_pos, cr);
+							if (value > 0 && (value > max || target == nullptr))
+							{
+								target = cr;
+								max = value;
+							}
 						}
 					}
 				}
