@@ -40,46 +40,28 @@
     <Filter Include="Resource Files\engine\font\noto">
       <UniqueIdentifier>{f7208394-61be-44c0-9992-57a2a749ba60}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\class">
-      <UniqueIdentifier>{f27690a5-ecc1-49e5-9fbb-5e38fc219f21}</UniqueIdentifier>
+    <Filter Include="Resource Files\dll_x64">
+      <UniqueIdentifier>{5a1582e3-1e58-4e93-b3d9-43dee2efb89c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\dll_x86">
+      <UniqueIdentifier>{dcffb9df-15af-4adc-889d-922fd21261a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\dll_x64\d3d">
+      <UniqueIdentifier>{13d251a8-1bc7-4510-98f7-4fc349cf8482}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\dll_x64\tobii">
+      <UniqueIdentifier>{273a25db-0ea2-4cbd-9300-183356db5104}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\dll_x86\d3d">
+      <UniqueIdentifier>{5c426d29-7ef4-498d-bff4-3c03430449c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\dll_x86\tobii">
+      <UniqueIdentifier>{00092991-0e64-42e3-be02-06c90ba3a9cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Unit.cpp">
-      <Filter>Source Files\class</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files\class</Filter>
-    </ClCompile>
-    <ClCompile Include="updateUnits.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="update.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TinyCamera.cpp">
-      <Filter>Source Files\class</Filter>
-    </ClCompile>
-    <ClCompile Include="GlobalVariable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="init.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files\class</Filter>
-    </ClCompile>
-    <ClCompile Include="Area.cpp">
-      <Filter>Source Files\class</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,33 +179,22 @@
     <None Include="engine\font\noto\NotoEmoji-Regular.ttf.zst">
       <Filter>Resource Files\engine\font\noto</Filter>
     </None>
+    <None Include="dll_x64\d3d\d3dcompiler_47.dll">
+      <Filter>Resource Files\dll_x64\d3d</Filter>
+    </None>
+    <None Include="dll_x64\tobii\tobii_stream_engine.dll">
+      <Filter>Resource Files\dll_x64\tobii</Filter>
+    </None>
+    <None Include="dll_x86\tobii\tobii_stream_engine.dll">
+      <Filter>Resource Files\dll_x86\tobii</Filter>
+    </None>
+    <None Include="dll_x86\d3d\d3dcompiler_47.dll">
+      <Filter>Resource Files\dll_x86\d3d</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="example\test.mp3">
       <Filter>Resource Files\example</Filter>
     </Media>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Unit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="File.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Area.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TinyCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
