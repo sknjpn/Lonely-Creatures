@@ -2,95 +2,97 @@
 
 class Assets;
 
+//基礎オブジェクト
+struct Object {
+
+	enum struct Type {
+		Creature,
+		Material,
+	};
+
+	bool	isSigned;
+	Type	type;
+	double	y;
+	double	vy;
+	Vec2	v;
+	Vec2	pos;
+	Vec2	angle;
+	bool	eraseFlag;
+
+	Object() : isSigned(false), eraseFlag(false) {}
+	Vec2	drawPos() const {
+		return pos.movedBy(0, -y);
+	}
+};
+
+//生物オブジェクト
+struct Creature : Object {
+
+	enum struct Type {
+		Clematis,
+		Slug,
+		Criket,
+	};
+
+	enum struct State {
+		Child,
+		Adult,
+	};
+
+	enum struct Gender {
+		None,
+		Female,
+		Male,
+	};
+
+	int		age;
+	int		health;
+	Type	type;
+	State	state;
+	Gender	gender;
+
+	Creature(const Vec2& _pos, const Type& _type);
+
+	int	maxHealth() const {
+		switch (type)
+		{
+		case Type::Clematis:return 5;
+		case Type::Slug:	return 12;
+		case Type::Criket:	return 20;
+		default: return 100;
+		}
+	}
+	double	size() const {
+		switch (type)
+		{
+		case Type::Clematis:return 16.0;
+		case Type::Slug:
+			if (state == State::Adult) return 18.0;
+			else return 8.0;
+		case Type::Criket:	return 32.0;
+		default: return 16.0;
+		}
+	}
+};
+
+//マテリアルオブジェクト
+struct Material : Object {
+
+	enum struct Type {
+		Leaf,
+		Meat,
+		Iron,
+		Fertilizer,
+	};
+
+	Type	type;
+	int		age;
+
+	Material(const Vec2& _pos, const Type& _type);
+};
+
 //フィールド
-class Field {
-public:
-
-
-	//基礎オブジェクト
-	struct Object {
-
-		enum struct Type {
-			Creature,
-			Material,
-		};
-
-		bool	isSigned;
-		Type	type;
-		double	y;
-		double	vy;
-		Vec2	v;
-		Vec2	pos;
-		Vec2	angle;
-		double	mass;
-
-		Object() : isSigned(false) {}
-	};
-
-	//生物オブジェクト
-	struct Creature : Object {
-
-		enum struct Type {
-			Crematis,
-			Slug,
-			Criket,
-		};
-
-		enum struct State {
-			Child,
-			Adult,
-		};
-
-		enum struct Gender {
-			None,
-			Female,
-			Male,
-		};
-
-		int		age;
-		int		health;
-		Type	type;
-		State	state;
-		Gender	gender;
-
-		Creature(const Vec2& _pos, const Type& _type);
-
-		int	maxHealth() const {
-			switch (type)
-			{
-			case Type::Crematis:return 5;
-			case Type::Slug:	return 12;
-			case Type::Criket:	return 20;
-			default: return 100;
-			}
-		}
-		double	size() const {
-			switch (type)
-			{
-			case Type::Crematis:return 16.0;
-			case Type::Slug:
-				if (state == State::Adult) return 18.0;
-				else return 8.0;
-			case Type::Criket:	return 32.0;
-			default: return 16.0;
-			}
-		}
-	};
-
-	//マテリアルオブジェクト
-	struct Material : Object {
-
-		enum struct Type {
-			Leaf,
-			Meat,
-			Iron,
-		};
-
-		Type	type;
-		int		age;
-
-		Material(const Vec2& _pos, const Type& _type);
-	};
+struct Field {
 
 	struct Table {
 
@@ -174,7 +176,6 @@ public:
 	size_t	maxNumMaterials;
 	Array<Creature>	creatures;
 	Array<Material>	materials;
-
 
 	Field(Assets* _assets);
 

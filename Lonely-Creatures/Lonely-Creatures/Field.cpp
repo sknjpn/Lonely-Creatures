@@ -1,10 +1,10 @@
 #include"Field.h"
 #include"Assets.h"
 
-typedef Field::Creature::Type CType;
-typedef Field::Material::Type MType;
+typedef Creature::Type CType;
+typedef Material::Type MType;
 
-Field::Material::Material(const Vec2& _pos, const Type& _type) {
+Material::Material(const Vec2& _pos, const Type& _type) {
 
 	pos = _pos;
 	type = _type;
@@ -12,7 +12,7 @@ Field::Material::Material(const Vec2& _pos, const Type& _type) {
 	age = 0;
 }
 
-Field::Creature::Creature(const Vec2& _pos, const Type& _type) {
+Creature::Creature(const Vec2& _pos, const Type& _type) {
 
 	angle = RandomVec2();
 	pos = _pos;
@@ -36,7 +36,7 @@ Field::Field(Assets* _assets)
 	creatures.reserve(maxNumCreatures);
 	materials.reserve(maxNumMaterials);
 
-	for (int i = 0; i < 1024; i++)  creatures.emplace_back(RandomVec2(region), CType::Crematis);
+	for (int i = 0; i < 1024; i++)  creatures.emplace_back(RandomVec2(region), CType::Clematis);
 	for (int i = 0; i < 128; i++)  creatures.emplace_back(RandomVec2(region), CType::Slug);
 	for (int i = 0; i < 16; i++)  creatures.emplace_back(RandomVec2(region), CType::Criket);
 }
@@ -46,13 +46,43 @@ void	Field::update() {
 	for (auto& c : creatures) {
 
 		switch (c.type) {
-		case CType::Crematis:
-			break;
-		case CType::Slug:
-			c.v += c.angle*0.02;
-			if (RandomBool(0.01)) c.angle = RandomVec2();
+		case CType::Clematis:
 			if (RandomBool(0.001)) c.state = Creature::State::Adult;
 			break;
+		case CType::Slug:
+		{
+			//Šl•¨
+			{
+				auto func = [](Vec2 pos, Creature* ct) {
+					if (ct->type != Creature::Type::Clematis || ct->state != Creature::State::Adult) return 0.0;
+					return 32.0 - (ct->pos - pos).length();
+				};
+
+				auto* ct = table.searchCreature(c.pos, 128.0, func);
+				if (ct != nullptr)
+				{
+					c.angle = (ct->pos - c.pos).normalized();
+					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0)
+					{
+						for (int i = 0; i < Random(1, 3); i++)
+						{
+							materials.emplace_back(ct->pos, Material::Type::Leaf);
+							materials.back().vy = 1.0;
+							materials.back().v = RandomVec2(1.0);
+						}
+						ct->state = Creature::State::Child;
+						if (RandomBool(0.25)) c.state = Creature::State::Adult;
+					}
+				}
+				else
+				{
+					if (RandomBool(0.01)) c.angle = RandomVec2();
+				}
+				c.v += c.angle*0.02;
+			}
+		}
+
+		break;
 		case CType::Criket:
 		{
 			//Šl•¨
@@ -131,14 +161,24 @@ void	Field::update() {
 
 		m.vy -= 0.2;
 		m.y += m.vy;
-		if (m.y <= 0)
-		{
+		if (m.y <= 0) {
 			m.y = 0;
 			m.vy = 0;
 		}
+		m.v /= 1.05;
+		m.pos += m.v;
+
+		if (m.age > 600) {
+			if (m.type == Material::Type::Fertilizer) m.eraseFlag = true;
+			else if (RandomBool(0.5)) m.eraseFlag = true;
+			else {
+				m.age = 0;
+				m.type = Material::Type::Fertilizer;
+			}
+		}
 	}
 
-	materials.remove_if([](Material& m) { return m.age > 1800; });
+	materials.remove_if([](Material& m) { return m.eraseFlag; });
 
 }
 
@@ -157,7 +197,7 @@ void	Field::draw() const {
 			if (pos == ct->pos) return 0.0;
 			return 32.0 - (ct->pos - pos).length();
 		};
-		Circle(c.pos, 32.0).draw(Color(128, 128));
+		Circle(c.pos, 32.0).draw(Color(128, 64));
 
 		auto* ct = table.searchCreature(c.pos, 32.0, func);
 		if (ct != nullptr)
@@ -173,7 +213,7 @@ void	Field::draw() const {
 				if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
 				return 128.0 - (ct->pos - pos).length();
 			};
-			Circle(c.pos, 128.0).draw(Color(Palette::Red, 128));
+			Circle(c.pos, 128.0).draw(Color(Palette::Red, 64));
 
 			auto* ct = table.searchCreature(c.pos, 128.0, func);
 			if (ct != nullptr)
@@ -191,12 +231,16 @@ void	Field::draw() const {
 
 		switch (c.type)
 		{
-		case CType::Crematis:
-			assets->texture(L"crematis.png")(RectF(32.0, 32.0)).resize(c.size(), c.size()).drawAt(p);
-			assets->texture(L"crematis.png")(RectF(32.0, 0.0, 32.0, 32.0)).resize(c.size(), c.size()).drawAt(p);
+		case CType::Clematis:
+			assets->texture(L"clematis.png")(RectF(32.0, 32.0)).resize(c.size(), c.size()).drawAt(p);
+			if (c.state == Creature::State::Adult) assets->texture(L"clematis.png")(RectF(32.0, 0.0, 32.0, 32.0)).resize(c.size(), c.size()).drawAt(p);
 			break;
 		case CType::Slug:
-			if (c.state == Creature::State::Adult) assets->texture(L"slugAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+			if (c.state == Creature::State::Adult)
+			{
+				if (c.vy > 0.0) assets->texture(L"slugAdultDamaged.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+				else assets->texture(L"slugAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+			}
 			else assets->texture(L"slugChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 			break;
 		case CType::Criket:
@@ -223,6 +267,12 @@ void	Field::draw() const {
 		{
 		case Material::Type::Meat:
 			assets->texture(L"meat.png").resize(8.0, 8.0).drawAt(p);
+			break;
+		case Material::Type::Leaf:
+			assets->texture(L"leaf.png").resize(8.0, 8.0).drawAt(p);
+			break;
+		case Material::Type::Fertilizer:
+			assets->texture(L"fertilizer.png").resize(8.0, 8.0).drawAt(p);
 			break;
 		default:
 			break;
