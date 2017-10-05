@@ -1,7 +1,7 @@
 ﻿#include"Camera.h"
 
 Camera::Camera()
-	: restrictedRegion(Vec2(-1024, -1024), 3 * Vec2(1024, 1024))
+	: restrictedRegion(Vec2(-2048, -2048), 3 * Vec2(2048, 2048))
 	, drawingRegion(0, 0, 1024, 1024)
 	, smoothDrawingRegion(drawingRegion)
 	, gazePoint(none)

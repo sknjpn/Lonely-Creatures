@@ -23,9 +23,11 @@ Field::Creature::Creature(const Vec2& _pos, const Type& _type) {
 }
 
 
-Field::Field(Assets* _assets) {
+Field::Field(Assets* _assets)
+	: table(64.0, Size(64, 64))
+{
 
-	region = RectF(0, 0, 1024, 1024);
+	region = RectF(0, 0, 2048, 2048);
 	assets = _assets;
 	maxNumCreatures = 1024;
 	maxNumMaterials = 1024;
@@ -36,7 +38,6 @@ Field::Field(Assets* _assets) {
 	for (int i = 0; i < 1024; i++)  creatures.emplace_back(RandomVec2(region), CType::Crematis);
 	for (int i = 0; i < 128; i++)  creatures.emplace_back(RandomVec2(region), CType::Slug);
 	for (int i = 0; i < 16; i++)  creatures.emplace_back(RandomVec2(region), CType::Criket);
-
 }
 
 void	Field::update() {
@@ -47,12 +48,12 @@ void	Field::update() {
 		case CType::Crematis:
 			break;
 		case CType::Slug:
-			c.pos += c.angle;
+			c.v += c.angle*0.02;
 			if (RandomBool(0.01)) c.angle = RandomVec2();
 			break;
 		case CType::Criket:
-			if(RandomBool(0.01) && c.y == 0) c.vy = 3;
-			c.pos += c.angle;
+			if (RandomBool(0.01) && c.y == 0) c.vy = 3;
+			c.v += c.angle*0.02;
 			if (RandomBool(0.01)) c.angle = RandomVec2();
 			break;
 		default:
@@ -71,12 +72,18 @@ void	Field::update() {
 			c.vy = 0;
 		}
 
-		c.pos += c.v;
-		if (region.br().x < c.pos.x) c.pos.x = region.br().x;
-		if (region.br().y < c.pos.y) c.pos.y = region.br().y;
-		if (region.x > c.pos.x) c.pos.x = region.x;
-		if (region.y > c.pos.y) c.pos.y = region.y;
+		c.v /= 1.05;
 
+		if (region.br().x < (c.pos + c.v).x) c.v.x = (region.br() - c.pos).x;
+		if (region.br().y < (c.pos + c.v).y)  c.v.y = (region.br() - c.pos).y;
+		if (region.x > (c.pos + c.v).x)  c.v.x = (region.pos - c.pos).x;
+		if (region.y > (c.pos + c.v).y)  c.v.y = (region.pos - c.pos).y;
+
+		if (!c.isSigned || table.chip(c.pos) != table.chip(c.pos += c.v)) {
+			table.chip(c.pos)->remove(&c);
+			table.chip(c.pos + c.v)->set(&c);
+		}
+		c.pos += c.v;
 	}
 
 	for (auto& m : materials) {
@@ -88,16 +95,47 @@ void	Field::update() {
 void	Field::draw() const {
 
 	region.draw(Palette::Darkkhaki);
-	region.drawFrame(16, Palette::Red);
+	region.drawFrame(8, Palette::Red);
 
 	//shadow
 	for (auto& c : creatures) {
 		Circle(c.pos, c.size() / 6.0).draw(Color(00, 192));
 	}
 
+	for (auto& c : creatures) {
+		auto func = [](Vec2 pos, Creature* ct) {
+			if (pos == ct->pos) return 0.0;
+			return 32.0 - (ct->pos - pos).length();
+		};
+		Circle(c.pos, 32.0).draw(Color(128, 128));
+
+		auto* ct = table.searchCreature(c.pos, 32.0, func);
+		if (ct != nullptr)
+		{
+			Line(c.pos, ct->pos).drawArrow();
+		}
+	}
 
 	for (auto& c : creatures) {
-		
+		if (c.type == Creature::Type::Criket)
+		{
+			auto func = [](Vec2 pos, Creature* ct) {
+				if (ct->type != Creature::Type::Slug) return 0.0;
+				return 128.0 - (ct->pos - pos).length();
+			};
+			Circle(c.pos, 128.0).draw(Color(Palette::Red, 128));
+
+			auto* ct = table.searchCreature(c.pos, 128.0, func);
+			if (ct != nullptr)
+			{
+				Line(c.pos, ct->pos).drawArrow(1.0, Vec2(5.0, 5.0), Palette::Red);
+			}
+		}
+	}
+
+
+	for (auto& c : creatures) {
+
 		double angleAsRadian = atan2(c.angle.y, c.angle.x);
 		Vec2 p = c.pos.movedBy(0, -c.y);
 
