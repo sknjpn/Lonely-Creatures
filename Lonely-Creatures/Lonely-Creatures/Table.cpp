@@ -1,6 +1,5 @@
 #include"Field.h"
 
-
 Table::Table(double _width, const Size& _size) 
 	: width(_width)
 	, size(_size) 

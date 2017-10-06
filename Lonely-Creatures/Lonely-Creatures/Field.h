@@ -53,26 +53,8 @@ struct Creature : Object {
 
 	Creature(const Vec2& _pos, const Type& _type);
 
-	int	maxHealth() const {
-		switch (type)
-		{
-		case Type::Clematis:return 5;
-		case Type::Slug:	return 12;
-		case Type::Cricket:	return 20;
-		default: return 100;
-		}
-	}
-	double	size() const {
-		switch (type)
-		{
-		case Type::Clematis:return 16.0;
-		case Type::Slug:
-			if (state == State::Adult) return 18.0;
-			else return 8.0;
-		case Type::Cricket:	return 32.0;
-		default: return 16.0;
-		}
-	}
+	int		maxHealth() const;
+	double	size() const;
 };
 
 //マテリアルオブジェクト
@@ -104,13 +86,11 @@ struct Chip {
 
 struct Table {
 
-
 	Grid<Chip> chips;
 	double	width;
 	Size	size;
 
 	Table(double _width, const Size& _size);
-
 
 	//最も評価値の高いものを返す、0.0以下のものしかない場合、nullptrを返す
 	Creature*	searchCreature(Vec2 _pos, double _range, double(*func)(Vec2, Creature*)) const;

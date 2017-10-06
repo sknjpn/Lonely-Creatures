@@ -11,7 +11,6 @@ Material::Material(const Vec2& _pos, const Type& _type) {
 	y = 0;
 	age = 0;
 }
-
 Creature::Creature(const Vec2& _pos, const Type& _type) {
 
 	angle = RandomVec2();
@@ -22,8 +21,26 @@ Creature::Creature(const Vec2& _pos, const Type& _type) {
 	vy = 0;
 	v = Vec2::Zero();
 }
-
-
+int		Creature::maxHealth() const {
+	switch (type)
+	{
+	case Type::Clematis:return 5;
+	case Type::Slug:	return 12;
+	case Type::Cricket:	return 20;
+	default: return 100;
+	}
+}
+double	Creature::size() const {
+	switch (type)
+	{
+	case Type::Clematis:return 16.0;
+	case Type::Slug:
+		if (state == State::Adult) return 18.0;
+		else return 8.0;
+	case Type::Cricket:	return 32.0;
+	default: return 16.0;
+	}
+}
 Field::Field(Assets* _assets)
 	: table(64.0, Size(64, 64))
 {
@@ -40,7 +57,6 @@ Field::Field(Assets* _assets)
 	for (int i = 0; i < 128; i++)  creatures.emplace_back(RandomVec2(region), CType::Slug);
 	for (int i = 0; i < 16; i++)  creatures.emplace_back(RandomVec2(region), CType::Cricket);
 }
-
 void	Field::update() {
 
 	for (auto& c : creatures) {
