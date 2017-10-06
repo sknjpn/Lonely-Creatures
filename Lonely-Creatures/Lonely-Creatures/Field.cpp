@@ -47,8 +47,8 @@ Field::Field(Assets* _assets)
 
 	region = RectF(0, 0, 2048, 2048);
 	assets = _assets;
-	maxNumCreatures = 1024;
-	maxNumMaterials = 1024;
+	maxNumCreatures = 65536;
+	maxNumMaterials = 65536;
 
 	creatures.reserve(maxNumCreatures);
 	materials.reserve(maxNumMaterials);
@@ -63,7 +63,19 @@ void	Field::update() {
 
 		switch (c.type) {
 		case CType::Clematis:
-			if (RandomBool(0.001)) c.state = Creature::State::Adult;
+			switch (c.state)
+			{
+			case Creature::State::Child:
+				if (RandomBool(0.001)) c.state = Creature::State::Adult;
+				break;
+			case Creature::State::Adult:
+				if (RandomBool(0.001))
+				{
+					auto& cc = creatures.emplace_back(c.pos, CType::Clematis);
+					cc.v = RandomVec2(2.0);
+				}
+				break;
+			}
 			break;
 		case CType::Slug:
 		{
