@@ -1,10 +1,12 @@
 #include"Field.h"
 
 
-Table::Table(double _width, const Size& _size) : width(_width), size(_size) {
+Table::Table(double _width, const Size& _size) 
+	: width(_width)
+	, size(_size) 
+{ 
 	chips.resize(_size);
 }
-
 Chip*	Table::chip(const Vec2& _pos) {
 	Point p(int(_pos.x / width), int(_pos.y / width));
 	if (p.x < 0 || p.y < 0 || p.x >= size.x || p.y >= size.y) return nullptr;
