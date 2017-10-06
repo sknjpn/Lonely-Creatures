@@ -64,11 +64,13 @@ void	Field::update() {
 					c.angle = (ct->pos - c.pos).normalized();
 					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0)
 					{
-						for (int i = 0; i < Random(1, 3); i++)
+						//葉っぱのドロップ
+						int n = Random(1, 3);
+						for (int i = 0; i < n; i++)
 						{
-							materials.emplace_back(ct->pos, Material::Type::Leaf);
-							materials.back().vy = 1.0;
-							materials.back().v = RandomVec2(1.0);
+							auto& m = materials.emplace_back(ct->pos, Material::Type::Leaf);
+							m.vy = 2.0;
+							m.v = RandomVec2(1.0);
 						}
 						ct->state = Creature::State::Child;
 						if (RandomBool(0.25)) c.state = Creature::State::Adult;
@@ -103,13 +105,19 @@ void	Field::update() {
 					}
 					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0 && c.y > 0)
 					{
-						materials.emplace_back(ct->pos, Material::Type::Meat);
-						materials.back().vy = 2.0;
 						ct->v += c.angle*2.0;
 						ct->vy += 2.0;
 						ct->health -= Random(4, 6);
 						if (ct->health < 0)
 						{
+							//肉のドロップ
+							int n = Random(3, 4);
+							for (int i = 0; i < n; i++)
+							{
+								auto& m = materials.emplace_back(ct->pos, Material::Type::Meat);
+								m.vy = 1.0;
+								m.v = RandomVec2(0.5);
+							}
 							ct->health = ct->maxHealth();
 							ct->state = Creature::State::Child;
 						}
