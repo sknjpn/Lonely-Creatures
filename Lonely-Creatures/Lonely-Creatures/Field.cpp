@@ -133,8 +133,6 @@ void	Field::update() {
 			}
 		}
 		break;
-		default:
-			break;
 		}
 
 		++c.age;
@@ -143,8 +141,7 @@ void	Field::update() {
 
 		c.vy -= 0.2;
 		c.y += c.vy;
-		if (c.y <= 0)
-		{
+		if (c.y <= 0) {
 			c.y = 0;
 			c.vy = 0;
 		}

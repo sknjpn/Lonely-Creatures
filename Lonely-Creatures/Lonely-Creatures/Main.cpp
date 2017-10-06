@@ -6,9 +6,6 @@ void Main() {
 
 	Game game;
 
-	while (System::Update()) {
+	while (System::Update()) game.update();
 
-		game.update();
-	
-	}
 }
