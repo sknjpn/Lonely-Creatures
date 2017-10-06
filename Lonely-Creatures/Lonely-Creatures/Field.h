@@ -94,6 +94,7 @@ struct Table {
 
 	//Å‚à•]‰¿’l‚Ì‚‚¢‚à‚Ì‚ğ•Ô‚·A0.0ˆÈ‰º‚Ì‚à‚Ì‚µ‚©‚È‚¢ê‡Anullptr‚ğ•Ô‚·
 	Creature*	searchCreature(Vec2 _pos, double _range, double(*func)(Vec2, Creature*)) const;
+	Material*	searchMaterial(Vec2 _pos, double _range, double(*func)(Vec2, Material*)) const;
 	Chip*	chip(const Vec2& _pos);
 };
 
