@@ -4,6 +4,22 @@
 typedef Creature::Type CType;
 typedef Material::Type MType;
 
+Field*	Object::field;
+Assets*	Object::assets;
+
+void	Material::erase() {
+	eraseFlag = true;
+	isSigned = false;
+	auto* c = field->table.chip(pos);
+	if (c != nullptr) c->remove(this);
+}
+void	Creature::erase() {
+	eraseFlag = true;
+	isSigned = false;
+	auto* c = field->table.chip(pos);
+	if (c != nullptr) c->remove(this);
+}
+
 Material::Material(const Vec2& _pos, const Type& _type) {
 
 	pos = _pos;
@@ -55,6 +71,9 @@ Field::Field(Assets* _assets)
 	creatures.reserve(maxNumCreatures);
 	materials.reserve(maxNumMaterials);
 
+	Object::field = this;
+	Object::assets = _assets;
+
 	for (int i = 0; i < 1024; i++)  creatures.emplace_back(RandomVec2(region), CType::Clematis);
 	for (int i = 0; i < 128; i++)  creatures.emplace_back(RandomVec2(region), CType::Slug);
 	for (int i = 0; i < 16; i++)  creatures.emplace_back(RandomVec2(region), CType::Cricket);
@@ -82,14 +101,31 @@ void	Field::update() {
 			break;
 		case CType::Slug:
 		{
-			//Šl•¨
-			{
-				auto func = [](Vec2 pos, Creature* ct) {
-					if (ct->type != Creature::Type::Clematis || ct->state != Creature::State::Adult) return 0.0;
-					return 32.0 - (ct->pos - pos).length();
-				};
+			auto func1 = [](Vec2 pos, Material* ct) {
+				if (ct->type != Material::Type::Leaf) return 0.0;
+				return 32.0 - (ct->pos - pos).length();
+			};
+			auto func2 = [](Vec2 pos, Creature* ct) {
+				if (ct->type != Creature::Type::Clematis || ct->state != Creature::State::Adult) return 0.0;
+				return 32.0 - (ct->pos - pos).length();
+			};
+			auto* mt = table.searchMaterial(c.pos, 32.0, func1);
+			if (mt != nullptr) {
+				c.angle = (mt->pos - c.pos).normalized();
+				if ((mt->pos - c.pos).length() < c.size() / 2.0) {
 
-				auto* ct = table.searchCreature(c.pos, 128.0, func);
+					mt->erase();
+
+					if (RandomBool(0.25))
+					{
+						if (c.state != Creature::State::Adult) c.state = Creature::State::Adult;
+						else creatures.emplace_back(c.pos, CType::Slug);
+					}
+				}
+			}
+			else
+			{
+				auto* ct = table.searchCreature(c.pos, 32.0, func2);
 				if (ct != nullptr) {
 					c.angle = (ct->pos - c.pos).normalized();
 					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0) {
@@ -100,36 +136,37 @@ void	Field::update() {
 							m.vy = 2.0;
 							m.v = RandomVec2(1.0);
 						}
-						ct->eraseFlag = true;
-						if (RandomBool(0.25))
-						{
-							if (c.state != Creature::State::Adult) {
-								c.state = Creature::State::Adult;
-							}
-							else {
-								creatures.emplace_back(c.pos, CType::Slug);
-							}
-						}
+						ct->erase();
 					}
 				}
 				else {
 					if (RandomBool(0.01)) c.angle = RandomVec2();
 				}
-				c.v += c.angle*0.02;
 			}
+			c.v += c.angle*0.02;
 		}
 
 		break;
 		case CType::Cricket:
 		{
-			//Šl•¨
-			{
-				auto func = [](Vec2 pos, Creature* ct) {
-					if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
-					return 128.0 - (ct->pos - pos).length();
-				};
+			auto func1 = [](Vec2 pos, Material* ct) {
+				if (ct->type != Material::Type::Meat) return 0.0;
+				return 128.0 - (ct->pos - pos).length();
+			};
+			auto func2 = [](Vec2 pos, Creature* ct) {
+				if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
+				return 128.0 - (ct->pos - pos).length();
+			};
 
-				auto* ct = table.searchCreature(c.pos, 128.0, func);
+			auto* mt = table.searchMaterial(c.pos, 128.0, func1);
+			if (mt != nullptr) {
+				c.angle = (mt->pos - c.pos).normalized();
+				if ((mt->pos - c.pos).length() < c.size() / 2.0) mt->erase();
+				c.v += c.angle*0.05;
+			}
+			else {
+
+				auto* ct = table.searchCreature(c.pos, 128.0, func2);
 				if (ct != nullptr) {
 					c.angle = (ct->pos - c.pos).normalized();
 					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0 + 4.0 && c.y == 0) {
@@ -148,9 +185,9 @@ void	Field::update() {
 							{
 								auto& m = materials.emplace_back(ct->pos, Material::Type::Meat);
 								m.vy = 1.0;
-								m.v = RandomVec2(0.5);
+								m.v = ct->v + RandomVec2(0.5);
 							}
-							ct->eraseFlag = true;
+							ct->erase();
 						}
 					}
 					c.v += c.angle*0.05;
@@ -191,7 +228,6 @@ void	Field::update() {
 	}
 
 	for (auto& m : materials) {
-
 		++m.age;
 
 		m.vy -= 0.2;
@@ -201,11 +237,22 @@ void	Field::update() {
 			m.vy = 0;
 		}
 		m.v /= 1.05;
+
+		if ((region.br() - m.pos).x < m.v.x) m.v.x = (region.br() - m.pos).x;
+		if ((region.br() - m.pos).y < m.v.y) m.v.y = (region.br() - m.pos).y;
+		if ((region.pos - m.pos).x > m.v.x)  m.v.x = (region.pos - m.pos).x;
+		if ((region.pos - m.pos).y > m.v.y)  m.v.y = (region.pos - m.pos).y;
+
+		if (!m.isSigned || table.chip(m.pos) != table.chip(m.pos += m.v)) {
+			table.chip(m.pos)->remove(&m);
+			table.chip(m.pos + m.v)->set(&m);
+		}
+
 		m.pos += m.v;
 
 		if (m.age > 600) {
-			if (m.type == Material::Type::Fertilizer) m.eraseFlag = true;
-			else if (RandomBool(0.5)) m.eraseFlag = true;
+			if (m.type == Material::Type::Fertilizer) m.erase();
+			else if (RandomBool(0.5)) m.erase();
 			else {
 				m.age = 0;
 				m.type = Material::Type::Fertilizer;

@@ -1,6 +1,7 @@
 #pragma once
 
 class Assets;
+struct Field;
 
 //基礎オブジェクト
 struct Object {
@@ -11,15 +12,21 @@ struct Object {
 	};
 
 	bool	isSigned;
+	bool	eraseFlag;
 	Type	type;
 	double	y;
 	double	vy;
 	Vec2	v;
 	Vec2	pos;
 	Vec2	angle;
-	bool	eraseFlag;
 
-	Object() : isSigned(false), eraseFlag(false) {}
+	static	Field*	field;
+	static	Assets*	assets;
+
+	Object() 
+		: isSigned(false)
+		, eraseFlag(false)
+	{}
 	Vec2	drawPos() const {
 		return pos.movedBy(0, -y);
 	}
@@ -55,6 +62,7 @@ struct Creature : Object {
 
 	int		maxHealth() const;
 	double	size() const;
+	void	erase();
 };
 
 //マテリアルオブジェクト
@@ -71,6 +79,8 @@ struct Material : Object {
 	int		age;
 
 	Material(const Vec2& _pos, const Type& _type);
+	double	size() const { return 8.0; }
+	void	erase();
 };
 
 struct Chip {
