@@ -33,7 +33,9 @@ int		Creature::maxHealth() const {
 double	Creature::size() const {
 	switch (type)
 	{
-	case Type::Clematis:return 16.0;
+	case Type::Clematis:
+		if (state == State::Adult) return 16.0;
+		else return 8.0;
 	case Type::Slug:
 		if (state == State::Adult) return 18.0;
 		else return 8.0;
@@ -73,6 +75,7 @@ void	Field::update() {
 				{
 					auto& cc = creatures.emplace_back(c.pos, CType::Clematis);
 					cc.v = RandomVec2(2.0);
+					cc.vy = 2.0;
 				}
 				break;
 			}
@@ -98,7 +101,15 @@ void	Field::update() {
 							m.v = RandomVec2(1.0);
 						}
 						ct->eraseFlag = true;
-						if (RandomBool(0.25)) c.state = Creature::State::Adult;
+						if (RandomBool(0.25))
+						{
+							if (c.state != Creature::State::Adult) {
+								c.state = Creature::State::Adult;
+							}
+							else {
+								creatures.emplace_back(c.pos, CType::Slug);
+							}
+						}
 					}
 				}
 				else {
@@ -139,8 +150,7 @@ void	Field::update() {
 								m.vy = 1.0;
 								m.v = RandomVec2(0.5);
 							}
-							ct->health = ct->maxHealth();
-							ct->state = Creature::State::Child;
+							ct->eraseFlag = true;
 						}
 					}
 					c.v += c.angle*0.05;
@@ -217,7 +227,7 @@ void	Field::draw() const {
 	for (auto& c : creatures) Circle(c.pos, c.size() / 6.0).draw(Color(0, 128));
 	for (auto& m : materials) Circle(m.pos, 1.5).draw(Color(0, 128));
 
-
+	/*
 	for (auto& c : creatures) {
 		auto func = [](Vec2 pos, Creature* ct) {
 			if (pos == ct->pos) return 0.0;
@@ -230,6 +240,7 @@ void	Field::draw() const {
 			Line(c.pos, ct->pos).drawArrow();
 		}
 	}
+	*/
 
 	for (auto& c : creatures) {
 		if (c.type == Creature::Type::Cricket) {
