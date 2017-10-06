@@ -237,8 +237,8 @@ void	Field::draw() const {
 		switch (c.type)
 		{
 		case CType::Clematis:
-			assets->texture(L"clematis.png")(RectF(32.0, 32.0)).resize(c.size(), c.size()).drawAt(p);
-			if (c.state == Creature::State::Adult) assets->texture(L"clematis.png")(RectF(32.0, 0.0, 32.0, 32.0)).resize(c.size(), c.size()).drawAt(p);
+			assets->texture(L"clematisLeaf.png").resize(c.size(), c.size()).drawAt(p);
+			if (c.state == Creature::State::Adult) assets->texture(L"clematisFlower.png").resize(c.size(), c.size()).drawAt(p);
 			break;
 		case CType::Slug:
 			if (c.state == Creature::State::Adult)
