@@ -97,7 +97,7 @@ void	Field::update() {
 							m.vy = 2.0;
 							m.v = RandomVec2(1.0);
 						}
-						ct->state = Creature::State::Child;
+						ct->eraseFlag = true;
 						if (RandomBool(0.25)) c.state = Creature::State::Adult;
 					}
 				}
@@ -204,6 +204,7 @@ void	Field::update() {
 	}
 
 	materials.remove_if([](Material& m) { return m.eraseFlag; });
+	creatures.remove_if([](Creature& c) { return c.eraseFlag; });
 
 }
 
