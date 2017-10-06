@@ -75,15 +75,12 @@ void	Field::update() {
 				};
 
 				auto* ct = table.searchCreature(c.pos, 128.0, func);
-				if (ct != nullptr)
-				{
+				if (ct != nullptr) {
 					c.angle = (ct->pos - c.pos).normalized();
-					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0)
-					{
+					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0) {
 						//葉っぱのドロップ
 						int n = Random(1, 3);
-						for (int i = 0; i < n; i++)
-						{
+						for (int i = 0; i < n; i++) {
 							auto& m = materials.emplace_back(ct->pos, Material::Type::Leaf);
 							m.vy = 2.0;
 							m.v = RandomVec2(1.0);
@@ -92,8 +89,7 @@ void	Field::update() {
 						if (RandomBool(0.25)) c.state = Creature::State::Adult;
 					}
 				}
-				else
-				{
+				else {
 					if (RandomBool(0.01)) c.angle = RandomVec2();
 				}
 				c.v += c.angle*0.02;
@@ -111,16 +107,13 @@ void	Field::update() {
 				};
 
 				auto* ct = table.searchCreature(c.pos, 128.0, func);
-				if (ct != nullptr)
-				{
+				if (ct != nullptr) {
 					c.angle = (ct->pos - c.pos).normalized();
-					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0 + 4.0 && c.y == 0)
-					{
+					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0 + 4.0 && c.y == 0) {
 						c.vy = 3;
 						c.v += c.angle*0.8;
 					}
-					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0 && c.y > 0)
-					{
+					if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0 && c.y > 0) {
 						ct->v += c.angle*2.0;
 						ct->vy += 2.0;
 						ct->health -= Random(4, 6);
@@ -140,8 +133,7 @@ void	Field::update() {
 					}
 					c.v += c.angle*0.05;
 				}
-				else
-				{
+				else {
 					if (RandomBool(0.01) && c.y == 0) c.vy = 3;
 					c.v += c.angle*0.02;
 					if (RandomBool(0.01)) c.angle = RandomVec2();
@@ -221,15 +213,13 @@ void	Field::draw() const {
 		Circle(c.pos, 32.0).draw(Color(128, 64));
 
 		auto* ct = table.searchCreature(c.pos, 32.0, func);
-		if (ct != nullptr)
-		{
+		if (ct != nullptr) {
 			Line(c.pos, ct->pos).drawArrow();
 		}
 	}
 
 	for (auto& c : creatures) {
-		if (c.type == Creature::Type::Cricket)
-		{
+		if (c.type == Creature::Type::Cricket) {
 			auto func = [](Vec2 pos, Creature* ct) {
 				if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
 				return 128.0 - (ct->pos - pos).length();
@@ -237,8 +227,7 @@ void	Field::draw() const {
 			Circle(c.pos, 128.0).draw(Color(Palette::Red, 64));
 
 			auto* ct = table.searchCreature(c.pos, 128.0, func);
-			if (ct != nullptr)
-			{
+			if (ct != nullptr) {
 				Line(c.pos, ct->pos).drawArrow(1.0, Vec2(5.0, 5.0), Palette::Red);
 			}
 		}
@@ -257,8 +246,7 @@ void	Field::draw() const {
 			if (c.state == Creature::State::Adult) assets->texture(L"clematisFlower.png").resize(c.size(), c.size()).drawAt(p);
 			break;
 		case CType::Slug:
-			if (c.state == Creature::State::Adult)
-			{
+			if (c.state == Creature::State::Adult) {
 				if (c.vy > 0.0) assets->texture(L"slugAdultDamaged.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 				else assets->texture(L"slugAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 			}
