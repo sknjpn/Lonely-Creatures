@@ -31,7 +31,7 @@ struct Creature : Object {
 	enum struct Type {
 		Clematis,
 		Slug,
-		Criket,
+		Cricket,
 	};
 
 	enum struct State {
@@ -58,7 +58,7 @@ struct Creature : Object {
 		{
 		case Type::Clematis:return 5;
 		case Type::Slug:	return 12;
-		case Type::Criket:	return 20;
+		case Type::Cricket:	return 20;
 		default: return 100;
 		}
 	}
@@ -69,7 +69,7 @@ struct Creature : Object {
 		case Type::Slug:
 			if (state == State::Adult) return 18.0;
 			else return 8.0;
-		case Type::Criket:	return 32.0;
+		case Type::Cricket:	return 32.0;
 		default: return 16.0;
 		}
 	}

@@ -38,7 +38,7 @@ Field::Field(Assets* _assets)
 
 	for (int i = 0; i < 1024; i++)  creatures.emplace_back(RandomVec2(region), CType::Clematis);
 	for (int i = 0; i < 128; i++)  creatures.emplace_back(RandomVec2(region), CType::Slug);
-	for (int i = 0; i < 16; i++)  creatures.emplace_back(RandomVec2(region), CType::Criket);
+	for (int i = 0; i < 16; i++)  creatures.emplace_back(RandomVec2(region), CType::Cricket);
 }
 
 void	Field::update() {
@@ -83,7 +83,7 @@ void	Field::update() {
 		}
 
 		break;
-		case CType::Criket:
+		case CType::Cricket:
 		{
 			//Šl•¨
 			{
@@ -207,7 +207,7 @@ void	Field::draw() const {
 	}
 
 	for (auto& c : creatures) {
-		if (c.type == Creature::Type::Criket)
+		if (c.type == Creature::Type::Cricket)
 		{
 			auto func = [](Vec2 pos, Creature* ct) {
 				if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
@@ -243,8 +243,8 @@ void	Field::draw() const {
 			}
 			else assets->texture(L"slugChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 			break;
-		case CType::Criket:
-			assets->texture(L"criket.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+		case CType::Cricket:
+			assets->texture(L"cricket.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 			break;
 		default:
 			break;
