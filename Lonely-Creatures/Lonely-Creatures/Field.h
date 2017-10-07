@@ -3,19 +3,27 @@
 class Assets;
 struct Field;
 struct Chip;
+struct Material;
+
+enum struct MType {
+	Leaf,
+	Meat,
+	Iron,
+	Fertilizer,
+};
+enum struct CType {
+	Clematis,
+	Slug,
+	Cricket,
+};
 
 //基礎オブジェクト
 struct Object {
 
-	enum struct Type {
-		Creature,
-		Material,
-	};
 
 	int		age;
 	Chip*	registeredChip;
 	bool	enabled;
-	Type	type;
 	double	y;
 	double	vy;
 	Vec2	v;
@@ -25,7 +33,7 @@ struct Object {
 	static	Field*	field;
 	static	Assets*	assets;
 
-	Object() 
+	Object()
 		: registeredChip(nullptr)
 		, enabled(true)
 		, age(0)
@@ -37,12 +45,6 @@ struct Object {
 
 //生物オブジェクト
 struct Creature : Object {
-
-	enum struct Type {
-		Clematis,
-		Slug,
-		Cricket,
-	};
 
 	enum struct State {
 		Egg,
@@ -58,36 +60,28 @@ struct Creature : Object {
 	};
 
 	int		health;
-	Type	type;
+	CType	type;
 	State	state;
 	Gender	gender;
 
 	static int	numEnabled;
 
 	Creature();
-	Creature(const Vec2& _pos, const Type& _type);
 
 	int		maxHealth() const;
 	double	size() const;
 	void	erase();
+	void	addMaterial(MType _type, double _force = 0.0, int _num = 1);
 };
 
 //マテリアルオブジェクト
 struct Material : Object {
 
-	enum struct Type {
-		Leaf,
-		Meat,
-		Iron,
-		Fertilizer,
-	};
-
-	Type	type;
+	MType	type;
 
 	static int	numEnabled;
 
 	Material();
-	Material(const Vec2& _pos, const Type& _type);
 	double	size() const { return 8.0; }
 	void	erase();
 };

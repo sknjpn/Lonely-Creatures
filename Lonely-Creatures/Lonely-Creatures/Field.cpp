@@ -1,8 +1,6 @@
 #include"Field.h"
 #include"Assets.h"
 
-typedef Creature::Type CType;
-typedef Material::Type MType;
 typedef Creature::State CState;
 
 Field*	Object::field;
@@ -22,29 +20,14 @@ void	Creature::erase() {
 }
 Material::Material() {
 	pos = RandomVec2(field->region);;
-	type = Type::Leaf;
-	y = 0;
-	age = 0;
-}
-Material::Material(const Vec2& _pos, const Type& _type) {
-	pos = _pos;
-	type = _type;
+	type = MType::Leaf;
 	y = 0;
 	age = 0;
 }
 Creature::Creature() {
 	angle = RandomVec2();
 	pos = RandomVec2(field->region);
-	type = Type::Clematis;
-	health = maxHealth();
-	y = 0;
-	vy = 0;
-	v = Vec2::Zero();
-}
-Creature::Creature(const Vec2& _pos, const Type& _type) {
-	angle = RandomVec2();
-	pos = _pos;
-	type = _type;
+	type = CType::Clematis;
 	health = maxHealth();
 	y = 0;
 	vy = 0;
@@ -53,30 +36,30 @@ Creature::Creature(const Vec2& _pos, const Type& _type) {
 int		Creature::maxHealth() const {
 	switch (type)
 	{
-	case Type::Clematis:return 5;
-	case Type::Slug:	return 12;
-	case Type::Cricket:	return 20;
+	case CType::Clematis:return 5;
+	case CType::Slug:	return 12;
+	case CType::Cricket:	return 20;
 	default: return 100;
 	}
 }
 double	Creature::size() const {
 	switch (type)
 	{
-	case Type::Clematis:
+	case CType::Clematis:
 		switch (state)
 		{
 		case CState::Seed:	return 4.0;
 		case CState::Child:	return 8.0;
 		case CState::Adult:	return 16.0;
 		}
-	case Type::Slug:
+	case CType::Slug:
 		switch (state)
 		{
 		case CState::Egg:	return 6.0;
 		case CState::Child:	return 8.0;
 		case CState::Adult:	return 12.0;
 		}
-	case Type::Cricket:
+	case CType::Cricket:
 		switch (state)
 		{
 		case CState::Egg:	return 6.0;
@@ -167,11 +150,7 @@ void	Field::update() {
 						c.state = CState::Adult;
 					}
 					else {
-						auto* m = newMaterial();
-						m->pos = c.pos;
-						m->type = MType::Fertilizer;
-						m->vy = 2.0;
-						m->v = RandomVec2(1.0);
+						c.addMaterial(MType::Fertilizer, 0.5);
 						c.erase();
 						continue;
 					}
@@ -188,13 +167,7 @@ void	Field::update() {
 						cc->v = RandomVec2(2.0);
 						cc->vy = 2.0;
 					}
-					for (int i = 0; i < 2; i++) {
-						auto* m = newMaterial();
-						m->pos = c.pos;
-						m->type = MType::Fertilizer;
-						m->vy = 2.0;
-						m->v = RandomVec2(1.0);
-					}
+					c.addMaterial(MType::Fertilizer, 0.5, 2);
 					c.erase();
 					continue;
 				}
