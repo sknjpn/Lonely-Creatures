@@ -77,7 +77,6 @@ struct Material : Object {
 	};
 
 	Type	type;
-	int		age;
 
 	Material();
 	Material(const Vec2& _pos, const Type& _type);

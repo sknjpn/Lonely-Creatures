@@ -1,6 +1,10 @@
 #include"Game.h"
 
-Game::Game() : field(&assets), display(&assets) {
+Game::Game()
+	: field(&assets)
+	, display(&assets)
+	, playSpeed(1)
+{
 
 	Window::SetTitle(L"Lonely Creatures");
 	Window::Resize(1280, 720);
@@ -11,9 +15,22 @@ Game::Game() : field(&assets), display(&assets) {
 
 void	Game::update() {
 
+	ClearPrint();
+
+	//PlaySpeed‚Ì’²®
+	if (KeyF1.down()) {
+		if (playSpeed == 1) playSpeed = 0;
+		else if (playSpeed > 1) playSpeed /= 2;
+	}
+	if (KeyF2.down()) {
+		if (playSpeed == 0) playSpeed = 1;
+		else if (playSpeed > 0 && playSpeed <= 64) playSpeed *= 2;
+	}
+	Print << L"ŽÀs‘¬“x = " << playSpeed;
+
 	camera.update();
 
-	field.update();
+	for (int i = 0; i < playSpeed; i++) field.update();
 
 	if (MouseL.down())
 	{

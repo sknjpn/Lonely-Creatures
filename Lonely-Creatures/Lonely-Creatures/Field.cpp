@@ -290,10 +290,6 @@ void	Field::update() {
 	
 	while (!materials.isEmpty() && !materials.back().enabled) materials.pop_back();
 	while (!creatures.isEmpty() && !creatures.back().enabled) creatures.pop_back();
-
-	ClearPrint();
-	Print << L"Material" << materials.size();
-	Print << L"Creature" << creatures.size();
 }
 
 void	Field::draw() const {

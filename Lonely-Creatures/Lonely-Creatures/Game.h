@@ -12,6 +12,7 @@ public:
 	Field	field;
 	Camera	camera;
 	Display	display;
+	int		playSpeed;
 
 	Game();
 
