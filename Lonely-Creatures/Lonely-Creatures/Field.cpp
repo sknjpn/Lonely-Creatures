@@ -148,7 +148,8 @@ void	Field::update() {
 						cc->v = RandomVec2(2.0);
 						cc->vy = 2.0;
 					}
-					c.enabled = false;
+					c.erase();
+					continue;
 				}
 				break;
 			}
@@ -174,7 +175,8 @@ void	Field::update() {
 						cc->type = CType::Slug;
 						cc->state = CState::Egg;
 					}
-					c.enabled = false;
+					c.erase();
+					continue;
 				}
 				//s“®
 				auto func1 = [](Vec2 pos, Material* ct) {
@@ -311,7 +313,7 @@ void	Field::update() {
 		}
 		c.pos += c.v;
 
-		if (c.age > 2400) c.erase();
+		if (c.age > 2400) { c.erase(); continue; }
 	}
 
 	for (auto& m : materials) {
@@ -319,8 +321,8 @@ void	Field::update() {
 
 
 		if (m.age > 600) {
-			if (m.type == MType::Fertilizer) m.erase();
-			else if (RandomBool(0.5)) m.erase();
+			if (m.type == MType::Fertilizer) { m.erase(); continue; }
+			else if (RandomBool(0.5)) { m.erase(); continue; }
 			else {
 				m.age = 0;
 				m.type = MType::Fertilizer;

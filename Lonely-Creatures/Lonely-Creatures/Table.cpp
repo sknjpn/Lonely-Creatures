@@ -76,18 +76,18 @@ Material*	Table::searchMaterial(Vec2 _pos, double _range, double(*func)(Vec2, Ma
 	return target;
 }
 void	Chip::remove(Creature* _creature) {
-	_creature->registeredChip = nullptr;
 	creatures.remove(_creature);
+	_creature->registeredChip = nullptr;
 }
 void	Chip::remove(Material* _material) {
-	_material->registeredChip = nullptr;
 	materials.remove(_material);
+	_material->registeredChip = nullptr;
 }
 void	Chip::set(Creature* _creature) {
-	_creature->registeredChip = this;
 	creatures.emplace_back(_creature);
+	_creature->registeredChip = this;
 }
 void	Chip::set(Material* _material) {
-	_material->registeredChip = this;
 	materials.emplace_back(_material);
+	_material->registeredChip = this;
 }
