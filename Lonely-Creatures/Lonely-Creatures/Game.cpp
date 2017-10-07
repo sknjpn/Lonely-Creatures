@@ -10,7 +10,7 @@ Game::Game()
 	Window::Resize(1280, 720);
 
 	assets.audio(L"‚©‚Ý‚³‚Ü‚Ì‚ä‚è‚©‚².mp3").setLoop(true);
-	assets.audio(L"‚©‚Ý‚³‚Ü‚Ì‚ä‚è‚©‚².mp3").play();
+	//assets.audio(L"‚©‚Ý‚³‚Ü‚Ì‚ä‚è‚©‚².mp3").play();
 }
 
 void	Game::update() {
