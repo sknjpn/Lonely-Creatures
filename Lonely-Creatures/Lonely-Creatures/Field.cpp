@@ -8,27 +8,39 @@ Field*	Object::field;
 Assets*	Object::assets;
 
 void	Material::erase() {
-	eraseFlag = true;
+	enabled = false;
 	registered = false;
 	auto* c = field->table.chip(pos);
 	if (c != nullptr) c->remove(this);
 }
 void	Creature::erase() {
-	eraseFlag = true;
+	enabled = false;
 	registered = false;
 	auto* c = field->table.chip(pos);
 	if (c != nullptr) c->remove(this);
 }
-
+Material::Material() {
+	pos = RandomVec2(field->region);;
+	type = Type::Leaf;
+	y = 0;
+	age = 0;
+}
 Material::Material(const Vec2& _pos, const Type& _type) {
-
 	pos = _pos;
 	type = _type;
 	y = 0;
 	age = 0;
 }
+Creature::Creature() {
+	angle = RandomVec2();
+	pos = RandomVec2(field->region);
+	type = Type::Clematis;
+	health = maxHealth();
+	y = 0;
+	vy = 0;
+	v = Vec2::Zero();
+}
 Creature::Creature(const Vec2& _pos, const Type& _type) {
-
 	angle = RandomVec2();
 	pos = _pos;
 	type = _type;
@@ -81,6 +93,7 @@ Field::Field(Assets* _assets)
 void	Field::update() {
 
 	for (auto& c : creatures) {
+		if (!c.enabled) continue;
 
 		switch (c.type) {
 		case CType::Clematis:
@@ -92,9 +105,11 @@ void	Field::update() {
 			case Creature::State::Adult:
 				if (RandomBool(0.001))
 				{
-					auto& cc = creatures.emplace_back(c.pos, CType::Clematis);
-					cc.v = RandomVec2(2.0);
-					cc.vy = 2.0;
+					auto* cc = newCreature();
+					cc->pos = c.pos;
+					cc->type = CType::Clematis;
+					cc->v = RandomVec2(2.0);
+					cc->vy = 2.0;
 				}
 				break;
 			}
@@ -112,14 +127,18 @@ void	Field::update() {
 			auto* mt = table.searchMaterial(c.pos, 32.0, func1);
 			if (mt != nullptr) {
 				c.angle = (mt->pos - c.pos).normalized();
-				if ((mt->pos - c.pos).length() < c.size() / 2.0) {
+				if ((mt->pos - c.pos).length() < c.size() / 2.0 + 4.0) {
 
 					mt->erase();
 
 					if (RandomBool(0.25))
 					{
 						if (c.state != Creature::State::Adult) c.state = Creature::State::Adult;
-						else creatures.emplace_back(c.pos, CType::Slug);
+						else {
+							auto* cc = newCreature();
+							cc->pos = c.pos;
+							cc->type = CType::Slug;
+						}
 					}
 				}
 			}
@@ -132,9 +151,11 @@ void	Field::update() {
 						//葉っぱのドロップ
 						int n = Random(1, 3);
 						for (int i = 0; i < n; i++) {
-							auto& m = materials.emplace_back(ct->pos, Material::Type::Leaf);
-							m.vy = 2.0;
-							m.v = RandomVec2(1.0);
+							auto* m = newMaterial();
+							m->pos = ct->pos;
+							m->type = Material::Type::Leaf;
+							m->vy = 2.0;
+							m->v = RandomVec2(1.0);
 						}
 						ct->erase();
 					}
@@ -183,9 +204,11 @@ void	Field::update() {
 							int n = Random(3, 4);
 							for (int i = 0; i < n; i++)
 							{
-								auto& m = materials.emplace_back(ct->pos, Material::Type::Meat);
-								m.vy = 1.0;
-								m.v = ct->v + RandomVec2(0.5);
+								auto* m = newMaterial();
+								m->pos = ct->pos;
+								m->type = Material::Type::Meat;
+								m->vy = 1.0;
+								m->v = RandomVec2(0.5);
 							}
 							ct->erase();
 						}
@@ -225,9 +248,13 @@ void	Field::update() {
 			table.chip(c.pos + c.v)->set(&c);
 		}
 		c.pos += c.v;
+
+		if (c.age > 2400) c.erase();
 	}
 
 	for (auto& m : materials) {
+		if (!m.enabled) continue;
+
 		++m.age;
 
 		m.vy -= 0.2;
@@ -260,9 +287,13 @@ void	Field::update() {
 		}
 	}
 
-	materials.remove_if([](Material& m) { return m.eraseFlag; });
-	creatures.remove_if([](Creature& c) { return c.eraseFlag; });
+	
+	while (!materials.isEmpty() && !materials.back().enabled) materials.pop_back();
+	while (!creatures.isEmpty() && !creatures.back().enabled) creatures.pop_back();
 
+	ClearPrint();
+	Print << L"Material" << materials.size();
+	Print << L"Creature" << creatures.size();
 }
 
 void	Field::draw() const {
@@ -271,9 +302,14 @@ void	Field::draw() const {
 	region.drawFrame(8, Palette::Red);
 
 	//shadow
-	for (auto& c : creatures) Circle(c.pos, c.size() / 6.0).draw(Color(0, 128));
-	for (auto& m : materials) Circle(m.pos, 1.5).draw(Color(0, 128));
-
+	for (auto& c : creatures) {
+		if (!c.enabled) continue;
+		Circle(c.pos, c.size() / 6.0).draw(Color(0, 128));
+	}
+	for (auto& m : materials) {
+		if (!m.enabled) continue;
+		Circle(m.pos, 1.5).draw(Color(0, 128));
+	}
 	/*
 	for (auto& c : creatures) {
 		auto func = [](Vec2 pos, Creature* ct) {
@@ -290,6 +326,7 @@ void	Field::draw() const {
 	*/
 
 	for (auto& c : creatures) {
+		if (!c.enabled) continue;
 		if (c.type == Creature::Type::Cricket) {
 			auto func = [](Vec2 pos, Creature* ct) {
 				if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
@@ -306,7 +343,7 @@ void	Field::draw() const {
 
 
 	for (auto& c : creatures) {
-
+		if (!c.enabled) continue;
 		double angleAsRadian = atan2(c.angle.y, c.angle.x);
 		Vec2 p = c.pos.movedBy(0, -c.y);
 
@@ -333,6 +370,7 @@ void	Field::draw() const {
 
 	//healthゲージ
 	for (auto& c : creatures) {
+		if (!c.enabled) continue;
 		double rate = double(c.health) / double(c.maxHealth());
 		auto p = c.pos.movedBy(-c.size() / 2.0, -c.size() / 2.0);
 		Line(p, p.movedBy(c.size(), 0.0)).draw(2, Palette::Red);
@@ -340,7 +378,7 @@ void	Field::draw() const {
 	}
 
 	for (auto& m : materials) {
-
+		if (!m.enabled) continue;
 		Vec2 p = m.pos.movedBy(0, -m.y - 3.0 + 0.8*sin(m.age / 20.0));
 
 		switch (m.type)

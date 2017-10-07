@@ -12,7 +12,7 @@ struct Object {
 	};
 
 	bool	registered;
-	bool	eraseFlag;
+	bool	enabled;
 	Type	type;
 	double	y;
 	double	vy;
@@ -25,7 +25,7 @@ struct Object {
 
 	Object() 
 		: registered(false)
-		, eraseFlag(false)
+		, enabled(true)
 	{}
 	Vec2	drawPos() const {
 		return pos.movedBy(0, -y);
@@ -58,6 +58,7 @@ struct Creature : Object {
 	State	state;
 	Gender	gender;
 
+	Creature();
 	Creature(const Vec2& _pos, const Type& _type);
 
 	int		maxHealth() const;
@@ -78,6 +79,7 @@ struct Material : Object {
 	Type	type;
 	int		age;
 
+	Material();
 	Material(const Vec2& _pos, const Type& _type);
 	double	size() const { return 8.0; }
 	void	erase();
@@ -123,4 +125,22 @@ struct Field {
 
 	void	update();
 	void	draw() const;
+	Creature*	newCreature() {
+		for (auto& c : creatures) {
+			if (!c.enabled) {
+				c = Creature();	//リセット;
+				return &c;
+			}
+		}
+		return &creatures.emplace_back();
+	}
+	Material*	newMaterial() {
+		for (auto& m : materials) {
+			if (!m.enabled) {
+				m = Material();	//リセット;
+				return &m;
+			}
+		}
+		return &materials.emplace_back();
+	}
 };
