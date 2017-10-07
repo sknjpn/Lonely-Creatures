@@ -11,6 +11,7 @@ struct Object {
 		Material,
 	};
 
+	int		age;
 	bool	registered;
 	bool	enabled;
 	Type	type;
@@ -26,6 +27,7 @@ struct Object {
 	Object() 
 		: registered(false)
 		, enabled(true)
+		, age(0)
 	{}
 	Vec2	drawPos() const {
 		return pos.movedBy(0, -y);
@@ -52,7 +54,6 @@ struct Creature : Object {
 		Male,
 	};
 
-	int		age;
 	int		health;
 	Type	type;
 	State	state;
