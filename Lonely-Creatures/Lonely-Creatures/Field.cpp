@@ -41,7 +41,7 @@ Field::Field(Assets* _assets)
 	: table(64.0, Size(64, 64))
 {
 
-	region = RectF(0, 0, 2048, 2048);
+	region = RectF(0, 0, 1024, 1024);
 	assets = _assets;
 	maxNumCreatures = 65536;
 	maxNumMaterials = 65536;
@@ -124,10 +124,10 @@ void	Field::update() {
 					int n = Random(2, 3);
 					for (int i = 0; i < n; i++) {
 						auto* cc = newCreature(CType::Clematis, CState::Seed, c.pos);
-						cc->v = RandomVec2(2.0);
+						cc->v = RandomVec2(1.0);
 						cc->vy = 2.0;
 					}
-					c.addMaterial(MType::Fertilizer, 0.5, 2);
+					c.addMaterial(MType::Leaf, 0.25, 2);
 					c.erase();
 					continue;
 				}
@@ -337,7 +337,7 @@ void	Field::draw() const {
 	}
 	for (auto& m : materials) {
 		if (!m.enabled) continue;
-		Circle(m.pos, 1.5).draw(Color(0, 128));
+		Circle(m.pos, m.size() / 6.0).draw(Color(0, 128));
 	}
 	/*
 	for (auto& c : creatures) {
@@ -428,28 +428,30 @@ void	Field::draw() const {
 	}
 
 	//healthƒQ[ƒW
-	for (auto& c : creatures) {
-		if (!c.enabled) continue;
-		double rate = double(c.health) / double(c.maxHealth());
-		auto p = c.pos.movedBy(-c.size() / 2.0, -c.size() / 2.0);
-		Line(p, p.movedBy(c.size(), 0.0)).draw(2, Palette::Red);
-		Line(p, p.movedBy(c.size()*rate, 0.0)).draw(2, Palette::Green);
+	if (KeyH.pressed()) {
+		for (auto& c : creatures) {
+			if (!c.enabled) continue;
+			double rate = double(c.health) / double(c.maxHealth());
+			auto p = c.pos.movedBy(-c.size() / 2.0, -c.size() / 2.0);
+			Line(p, p.movedBy(c.size(), 0.0)).draw(2, Palette::Red);
+			Line(p, p.movedBy(c.size()*rate, 0.0)).draw(2, Palette::Green);
+		}
 	}
 
 	for (auto& m : materials) {
 		if (!m.enabled) continue;
-		Vec2 p = m.pos.movedBy(0, -m.y - 3.0 + 0.8*sin(m.age / 20.0));
-
+		const Vec2& p = m.pos.movedBy(0, -m.y - 0.8 + 0.4*sin(m.age / 20.0));
+		const Vec2& size = { m.size(), m.size() };
 		switch (m.type)
 		{
 		case MType::Meat:
-			assets->texture(L"meat.png").resize(8.0, 8.0).drawAt(p);
+			assets->texture(L"meat.png").resize(size).drawAt(p);
 			break;
 		case MType::Leaf:
-			assets->texture(L"leaf.png").resize(8.0, 8.0).drawAt(p);
+			assets->texture(L"leaf.png")(int(m.age / 150) * 32, 0, 32, 32).resize(size).drawAt(p);
 			break;
 		case MType::Fertilizer:
-			assets->texture(L"fertilizer.png").resize(8.0, 8.0).drawAt(p);
+			assets->texture(L"fertilizer.png").resize(size).drawAt(p);
 			break;
 		default:
 			break;

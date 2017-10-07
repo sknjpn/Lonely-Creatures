@@ -9,7 +9,7 @@ int		Material::numEnabled = 0;
 void	Creature::addMaterial(MType _type, double _force, int _num) {
 	for (int i = 0; i < _num; i++) {
 		auto* m = field->newMaterial(_type, pos);
-		m->vy = _force;
+		m->vy = _force*4.0;
 		m->v = RandomVec2(_force);
 	}
 }

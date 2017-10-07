@@ -84,7 +84,7 @@ struct Material : Object {
 	static int	numEnabled;
 
 	Material() { Material::numEnabled++; }
-	double	size() const { return 8.0; }
+	double	size() const { return 4.0; }
 	void	erase();
 };
 
