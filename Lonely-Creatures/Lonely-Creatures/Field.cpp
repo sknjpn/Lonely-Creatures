@@ -293,29 +293,22 @@ void	Field::update() {
 		}
 		break;
 		}
-		
+
 		//ƒwƒ‹ƒX‰ñ•œ
 		if (RandomBool(0.01) && c.health < c.maxHealth()) c.health += 1;
 
 		//ƒJƒEƒ“ƒ^
 		++c.age;
 
-
 		//‰^“®ˆ—
 		c.vy -= 0.2;
 		c.y += c.vy;
-		if (c.y <= 0) {
-			c.y = 0;
-			c.vy = 0;
-		}
-
+		if (c.y <= 0) { c.y = 0; c.vy = 0; }
 		c.v /= 1.05;
-
 		if ((region.br() - c.pos).x < c.v.x) c.v.x = (region.br() - c.pos).x;
 		if ((region.br() - c.pos).y < c.v.y) c.v.y = (region.br() - c.pos).y;
 		if ((region.pos - c.pos).x > c.v.x)  c.v.x = (region.pos - c.pos).x;
 		if ((region.pos - c.pos).y > c.v.y)  c.v.y = (region.pos - c.pos).y;
-
 		if (!c.registered || table.chip(c.pos) != table.chip(c.pos += c.v)) {
 			table.chip(c.pos)->remove(&c);
 			table.chip(c.pos + c.v)->set(&c);
@@ -349,17 +342,14 @@ void	Field::update() {
 			m.vy = 0;
 		}
 		m.v /= 1.05;
-
 		if ((region.br() - m.pos).x < m.v.x) m.v.x = (region.br() - m.pos).x;
 		if ((region.br() - m.pos).y < m.v.y) m.v.y = (region.br() - m.pos).y;
 		if ((region.pos - m.pos).x > m.v.x)  m.v.x = (region.pos - m.pos).x;
 		if ((region.pos - m.pos).y > m.v.y)  m.v.y = (region.pos - m.pos).y;
-
 		if (!m.registered || table.chip(m.pos) != table.chip(m.pos += m.v)) {
 			table.chip(m.pos)->remove(&m);
 			table.chip(m.pos + m.v)->set(&m);
 		}
-
 		m.pos += m.v;
 
 	}
