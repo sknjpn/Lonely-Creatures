@@ -105,9 +105,21 @@ Field::Field(Assets* _assets)
 	Object::field = this;
 	Object::assets = _assets;
 
-	for (int i = 0; i < 1024; i++)  creatures.emplace_back(RandomVec2(region), CType::Clematis);
-	for (int i = 0; i < 128; i++)  creatures.emplace_back(RandomVec2(region), CType::Slug);
-	for (int i = 0; i < 16; i++)  creatures.emplace_back(RandomVec2(region), CType::Cricket);
+	for (int i = 0; i < 1024; i++) {
+		auto* c = newCreature();
+		c->pos = RandomVec2(region);
+		c->type = CType::Clematis;
+	}
+	for (int i = 0; i < 128; i++) {
+		auto* c = newCreature();
+		c->pos = RandomVec2(region);
+		c->type = CType::Slug;
+	}
+	for (int i = 0; i < 16; i++) {
+		auto* c = newCreature();
+		c->pos = RandomVec2(region);
+		c->type = CType::Cricket;
+	}
 }
 void	Field::update() {
 
