@@ -1,9 +1,9 @@
 #include"Field.h"
 
-Table::Table(double _width, const Size& _size) 
+Table::Table(double _width, const Size& _size)
 	: width(_width)
-	, size(_size) 
-{ 
+	, size(_size)
+{
 	chips.resize(_size);
 }
 Chip*	Table::chip(const Vec2& _pos) {
@@ -74,4 +74,20 @@ Material*	Table::searchMaterial(Vec2 _pos, double _range, double(*func)(Vec2, Ma
 	}
 
 	return target;
+}
+void	Chip::remove(Creature* _creature) {
+	_creature->registeredChip = nullptr;
+	creatures.remove(_creature);
+}
+void	Chip::remove(Material* _material) {
+	_material->registeredChip = nullptr;
+	materials.remove(_material);
+}
+void	Chip::set(Creature* _creature) {
+	_creature->registeredChip = this;
+	creatures.emplace_back(_creature);
+}
+void	Chip::set(Material* _material) {
+	_material->registeredChip = this;
+	materials.emplace_back(_material);
 }

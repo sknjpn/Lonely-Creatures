@@ -2,6 +2,7 @@
 
 class Assets;
 struct Field;
+struct Chip;
 
 //基礎オブジェクト
 struct Object {
@@ -12,7 +13,7 @@ struct Object {
 	};
 
 	int		age;
-	bool	registered;
+	Chip*	registeredChip;
 	bool	enabled;
 	Type	type;
 	double	y;
@@ -25,7 +26,7 @@ struct Object {
 	static	Assets*	assets;
 
 	Object() 
-		: registered(false)
+		: registeredChip(nullptr)
 		, enabled(true)
 		, age(0)
 	{}
@@ -96,10 +97,10 @@ struct Chip {
 	Array<Creature*> creatures;
 	Array<Material*> materials;
 
-	void	remove(Creature* _creature) { creatures.remove(_creature); }
-	void	remove(Material* _material) { materials.remove(_material); }
-	void	set(Creature* _creature) { creatures.emplace_back(_creature); }
-	void	set(Material* _material) { materials.emplace_back(_material); }
+	void	remove(Creature* _creature);
+	void	remove(Material* _material);
+	void	set(Creature* _creature);
+	void	set(Material* _material);
 };
 
 struct Table {

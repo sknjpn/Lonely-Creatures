@@ -13,16 +13,12 @@ int		Material::numEnabled = 0;
 void	Material::erase() {
 	numEnabled--;
 	enabled = false;
-	registered = false;
-	auto* c = field->table.chip(pos);
-	if (c != nullptr) c->remove(this);
+	if (registeredChip != nullptr) registeredChip->remove(this);
 }
 void	Creature::erase() {
 	numEnabled--;
 	enabled = false;
-	registered = false;
-	auto* c = field->table.chip(pos);
-	if (c != nullptr) c->remove(this);
+	if (registeredChip != nullptr) registeredChip->remove(this);
 }
 Material::Material() {
 	pos = RandomVec2(field->region);;
@@ -309,8 +305,8 @@ void	Field::update() {
 		if ((region.br() - c.pos).y < c.v.y) c.v.y = (region.br() - c.pos).y;
 		if ((region.pos - c.pos).x > c.v.x)  c.v.x = (region.pos - c.pos).x;
 		if ((region.pos - c.pos).y > c.v.y)  c.v.y = (region.pos - c.pos).y;
-		if (!c.registered || table.chip(c.pos) != table.chip(c.pos += c.v)) {
-			table.chip(c.pos)->remove(&c);
+		if (c.registeredChip == nullptr || c.registeredChip != table.chip(c.pos += c.v)) {
+			if (c.registeredChip != nullptr) c.registeredChip->remove(&c);
 			table.chip(c.pos + c.v)->set(&c);
 		}
 		c.pos += c.v;
@@ -346,8 +342,8 @@ void	Field::update() {
 		if ((region.br() - m.pos).y < m.v.y) m.v.y = (region.br() - m.pos).y;
 		if ((region.pos - m.pos).x > m.v.x)  m.v.x = (region.pos - m.pos).x;
 		if ((region.pos - m.pos).y > m.v.y)  m.v.y = (region.pos - m.pos).y;
-		if (!m.registered || table.chip(m.pos) != table.chip(m.pos += m.v)) {
-			table.chip(m.pos)->remove(&m);
+		if (m.registeredChip == nullptr || m.registeredChip != table.chip(m.pos += m.v)) {
+			if (m.registeredChip != nullptr) m.registeredChip->remove(&m);
 			table.chip(m.pos + m.v)->set(&m);
 		}
 		m.pos += m.v;
