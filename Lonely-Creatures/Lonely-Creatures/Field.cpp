@@ -107,6 +107,12 @@ Field::Field(Assets* _assets)
 		c->type = CType::Clematis;
 		c->state = CState::Seed;
 	}
+	for (int i = 0; i < 1024; i++) {
+		auto* m = newMaterial();
+		m->pos = RandomVec2(region);
+		m->type = MType::Fertilizer;
+	}
+	/*
 	for (int i = 0; i < 128; i++) {
 		auto* c = newCreature();
 		c->pos = RandomVec2(region);
@@ -119,6 +125,7 @@ Field::Field(Assets* _assets)
 		c->type = CType::Cricket;
 		c->state = CState::Egg;
 	}
+	*/
 }
 void	Field::update() {
 
@@ -130,23 +137,63 @@ void	Field::update() {
 			switch (c.state)
 			{
 			case CState::Seed:
-				if (c.age > 300) c.state = CState::Child;
+				if (c.age > 300) {
+					//‰h—{‚Ì‹zŽû
+					auto func = [](Vec2 pos, Material* mt) {
+						if (mt->type != MType::Fertilizer) return 0.0;
+						return 64.0 - (mt->pos - pos).length();
+					};
+					auto* mt = table.searchMaterial(c.pos, 64.0, func);
+					if (mt != nullptr) {
+						mt->erase();
+						c.state = CState::Child;
+					}
+					else {
+						c.erase();
+						continue;
+					}
+				}
 				break;
 			case CState::Child:
-				if (c.age > 600) c.state = CState::Adult;
+				if (c.age > 600) {
+					//‰h—{‚Ì‹zŽû
+					auto func = [](Vec2 pos, Material* mt) {
+						if (mt->type != MType::Fertilizer) return 0.0;
+						return 64.0 - (mt->pos - pos).length();
+					};
+					auto* mt = table.searchMaterial(c.pos, 64.0, func);
+					if (mt != nullptr) {
+						mt->erase();
+						c.state = CState::Adult;
+					}
+					else {
+						auto* m = newMaterial();
+						m->pos = c.pos;
+						m->type = MType::Fertilizer;
+						m->vy = 2.0;
+						m->v = RandomVec2(1.0);
+						c.erase();
+						continue;
+					}
+				}
 				break;
 			case CState::Adult:
-				if (c.age > 1200)
-				{
+				if (c.age > 1200) {
 					int n = Random(2, 3);
-					for (int i = 0; i < n; i++)
-					{
+					for (int i = 0; i < n; i++) {
 						auto* cc = newCreature();
 						cc->pos = c.pos;
 						cc->type = CType::Clematis;
 						cc->state = CState::Seed;
 						cc->v = RandomVec2(2.0);
 						cc->vy = 2.0;
+					}
+					for (int i = 0; i < 2; i++) {
+						auto* m = newMaterial();
+						m->pos = c.pos;
+						m->type = MType::Fertilizer;
+						m->vy = 2.0;
+						m->v = RandomVec2(1.0);
 					}
 					c.erase();
 					continue;
@@ -319,14 +366,20 @@ void	Field::update() {
 	for (auto& m : materials) {
 		if (!m.enabled) continue;
 
-
-		if (m.age > 600) {
-			if (m.type == MType::Fertilizer) { m.erase(); continue; }
-			else if (RandomBool(0.5)) { m.erase(); continue; }
-			else {
-				m.age = 0;
-				m.type = MType::Fertilizer;
-			}
+		switch (m.type)
+		{
+		case MType::Fertilizer:
+			break;
+		case MType::Iron:
+			break;
+		case MType::Leaf:
+			if (m.age > 600) { m.type = MType::Fertilizer; m.age = 0; }
+			break;
+		case MType::Meat:
+			if (m.age > 600) { m.type = MType::Fertilizer; m.age = 0; }
+			break;
+		default:
+			break;
 		}
 
 		//ƒJƒEƒ“ƒ^
