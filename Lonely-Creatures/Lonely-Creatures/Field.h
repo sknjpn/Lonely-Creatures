@@ -16,6 +16,12 @@ enum struct CType {
 	Slug,
 	Cricket,
 };
+enum struct CState {
+	Egg,
+	Seed,
+	Child,
+	Adult,
+};
 
 //基礎オブジェクト
 struct Object {
@@ -34,9 +40,14 @@ struct Object {
 	static	Assets*	assets;
 
 	Object()
-		: registeredChip(nullptr)
+		: age(0)
+		, registeredChip(nullptr)
 		, enabled(true)
-		, age(0)
+		, y(0.0)
+		, vy(0.0)
+		, v(Vec2::Zero())
+		, pos(Vec2::Zero())
+		, angle(RandomVec2())
 	{}
 	Vec2	drawPos() const {
 		return pos.movedBy(0, -y);
@@ -46,27 +57,13 @@ struct Object {
 //生物オブジェクト
 struct Creature : Object {
 
-	enum struct State {
-		Egg,
-		Seed,
-		Child,
-		Adult,
-	};
-
-	enum struct Gender {
-		None,
-		Female,
-		Male,
-	};
-
 	int		health;
 	CType	type;
-	State	state;
-	Gender	gender;
+	CState	state;
 
 	static int	numEnabled;
 
-	Creature();
+	Creature() { Creature::numEnabled++; }
 
 	int		maxHealth() const;
 	double	size() const;
@@ -81,7 +78,7 @@ struct Material : Object {
 
 	static int	numEnabled;
 
-	Material();
+	Material() { Material::numEnabled++; }
 	double	size() const { return 8.0; }
 	void	erase();
 };
@@ -126,24 +123,8 @@ struct Field {
 
 	void	update();
 	void	draw() const;
-	Creature*	newCreature() {
-		Creature::numEnabled++;
-		for (auto& c : creatures) {
-			if (!c.enabled) {
-				c = Creature();	//リセット;
-				return &c;
-			}
-		}
-		return &creatures.emplace_back();
-	}
-	Material*	newMaterial() {
-		Material::numEnabled++;
-		for (auto& m : materials) {
-			if (!m.enabled) {
-				m = Material();	//リセット;
-				return &m;
-			}
-		}
-		return &materials.emplace_back();
-	}
+	Creature*	newCreature(CType _type, CState _state, const Vec2& _pos);
+	Creature*	newCreature(CType _type, CState _state);
+	Material*	newMaterial(MType _type, const Vec2& _pos);
+	Material*	newMaterial(MType _type);
 };

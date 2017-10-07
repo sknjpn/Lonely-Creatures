@@ -1,43 +1,11 @@
 #include"Field.h"
 #include"Assets.h"
 
-typedef Creature::State CState;
-
-Field*	Object::field;
-Assets*	Object::assets;
-int		Creature::numEnabled = 0;
-int		Material::numEnabled = 0;
-
-void	Material::erase() {
-	numEnabled--;
-	enabled = false;
-	if (registeredChip != nullptr) registeredChip->remove(this);
-}
-void	Creature::erase() {
-	numEnabled--;
-	enabled = false;
-	if (registeredChip != nullptr) registeredChip->remove(this);
-}
-Material::Material() {
-	pos = RandomVec2(field->region);;
-	type = MType::Leaf;
-	y = 0;
-	age = 0;
-}
-Creature::Creature() {
-	angle = RandomVec2();
-	pos = RandomVec2(field->region);
-	type = CType::Clematis;
-	health = maxHealth();
-	y = 0;
-	vy = 0;
-	v = Vec2::Zero();
-}
 int		Creature::maxHealth() const {
 	switch (type)
 	{
-	case CType::Clematis:return 5;
-	case CType::Slug:	return 12;
+	case CType::Clematis:	return 5;
+	case CType::Slug:		return 12;
 	case CType::Cricket:	return 20;
 	default: return 100;
 	}
@@ -84,30 +52,12 @@ Field::Field(Assets* _assets)
 	Object::field = this;
 	Object::assets = _assets;
 
-	for (int i = 0; i < 1024; i++) {
-		auto* c = newCreature();
-		c->pos = RandomVec2(region);
-		c->type = CType::Clematis;
-		c->state = CState::Seed;
-	}
-	for (int i = 0; i < 1024; i++) {
-		auto* m = newMaterial();
-		m->pos = RandomVec2(region);
-		m->type = MType::Fertilizer;
-	}
+	for (int i = 0; i < 1024; i++) newCreature(CType::Clematis, CState::Seed);
+	for (int i = 0; i < 2048; i++) newMaterial(MType::Fertilizer);
 	/*
-	for (int i = 0; i < 128; i++) {
-		auto* c = newCreature();
-		c->pos = RandomVec2(region);
-		c->type = CType::Slug;
-		c->state = CState::Egg;
-	}
-	for (int i = 0; i < 16; i++) {
-		auto* c = newCreature();
-		c->pos = RandomVec2(region);
-		c->type = CType::Cricket;
-		c->state = CState::Egg;
-	}
+	for (int i = 0; i < 128; i++) newCreature(CType::Slug, CState::Egg);
+	for (int i = 0; i < 16; i++) newCreature(CType::Cricket, CState::Egg);
+
 	*/
 }
 void	Field::update() {
@@ -160,10 +110,7 @@ void	Field::update() {
 				if (c.age > 1200) {
 					int n = Random(2, 3);
 					for (int i = 0; i < n; i++) {
-						auto* cc = newCreature();
-						cc->pos = c.pos;
-						cc->type = CType::Clematis;
-						cc->state = CState::Seed;
+						auto* cc = newCreature(CType::Clematis, CState::Seed, c.pos);
 						cc->v = RandomVec2(2.0);
 						cc->vy = 2.0;
 					}
@@ -188,13 +135,7 @@ void	Field::update() {
 			{
 				if (c.age > 1200) {
 					int n = Random(2, 3);
-					for (int i = 0; i < n; i++)
-					{
-						auto* cc = newCreature();
-						cc->pos = c.pos;
-						cc->type = CType::Slug;
-						cc->state = CState::Egg;
-					}
+					for (int i = 0; i < n; i++) newCreature(CType::Slug, CState::Egg);
 					c.erase();
 					continue;
 				}
@@ -221,14 +162,8 @@ void	Field::update() {
 						c.angle = (ct->pos - c.pos).normalized();
 						if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0) {
 							//葉っぱのドロップ
-							int n = Random(1, 3);
-							for (int i = 0; i < n; i++) {
-								auto* m = newMaterial();
-								m->pos = ct->pos;
-								m->type = MType::Leaf;
-								m->vy = 2.0;
-								m->v = RandomVec2(1.0);
-							}
+							ct->addMaterial(MType::Leaf, 1.0, Random(1, 3));
+
 							ct->erase();
 						}
 					}
@@ -288,15 +223,8 @@ void	Field::update() {
 						if (ct->health < 0)
 						{
 							//肉のドロップ
-							int n = Random(3, 4);
-							for (int i = 0; i < n; i++)
-							{
-								auto* m = newMaterial();
-								m->pos = ct->pos;
-								m->type = MType::Meat;
-								m->vy = 1.0;
-								m->v = RandomVec2(0.5);
-							}
+							ct->addMaterial(MType::Meat, 2.0, Random(3, 5));
+
 							ct->erase();
 						}
 					}
@@ -514,4 +442,44 @@ void	Field::draw() const {
 		}
 	}
 
+}
+Creature*	Field::newCreature(CType _type, CState _state, const Vec2& _pos) {
+	Creature* nc = nullptr;
+	if (creatures.size() > Creature::numEnabled) {
+		for (auto& c : creatures) {
+			if (!c.enabled) {
+				c = Creature();	//リセット;
+				nc = &c;
+				break;
+			}
+		}
+	}
+	else nc = &creatures.emplace_back();
+	nc->type = _type;
+	nc->health = nc->maxHealth();
+	nc->state = _state;
+	nc->pos = _pos;
+	return nc;
+}
+Creature*	Field::newCreature(CType _type, CState _state) {
+	return newCreature(_type, _state, RandomVec2(region));
+}
+Material*	Field::newMaterial(MType _type, const Vec2& _pos) {
+	Material* nm = nullptr;
+	if (materials.size() > Material::numEnabled) {
+		for (auto& m : materials) {
+			if (!m.enabled) {
+				m = Material();	//リセット;
+				nm = &m;
+				break;
+			}
+		}
+	}
+	else nm = &materials.emplace_back();
+	nm->type = _type;
+	nm->pos = _pos;
+	return nm;
+}
+Material*	Field::newMaterial(MType _type) {
+	return newMaterial(_type, RandomVec2(region));
 }
