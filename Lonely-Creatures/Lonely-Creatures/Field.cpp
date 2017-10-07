@@ -3,6 +3,7 @@
 
 typedef Creature::Type CType;
 typedef Material::Type MType;
+typedef Creature::State CState;
 
 Field*	Object::field;
 Assets*	Object::assets;
@@ -64,23 +65,23 @@ double	Creature::size() const {
 	case Type::Clematis:
 		switch (state)
 		{
-		case Creature::State::Seed:	return 2.0;
-		case Creature::State::Child:return 8.0;
-		case Creature::State::Adult:return 16.0;
+		case CState::Seed:	return 2.0;
+		case CState::Child:return 8.0;
+		case CState::Adult:return 16.0;
 		}
 	case Type::Slug:
 		switch (state)
 		{
-		case Creature::State::Egg:	return 3.0;
-		case Creature::State::Child:return 12.0;
-		case Creature::State::Adult:return 8.0;
+		case CState::Egg:	return 3.0;
+		case CState::Child:return 12.0;
+		case CState::Adult:return 8.0;
 		}
 	case Type::Cricket:
 		switch (state)
 		{
-		case Creature::State::Egg:	return 4.0;
-		case Creature::State::Child:return 16.0;
-		case Creature::State::Adult:return 32.0;
+		case CState::Egg:	return 4.0;
+		case CState::Child:return 16.0;
+		case CState::Adult:return 32.0;
 		}
 	default: return 16.0;
 	}
@@ -113,10 +114,10 @@ void	Field::update() {
 		case CType::Clematis:
 			switch (c.state)
 			{
-			case Creature::State::Child:
-				if (RandomBool(0.001)) c.state = Creature::State::Adult;
+			case CState::Child:
+				if (RandomBool(0.001)) c.state = CState::Adult;
 				break;
-			case Creature::State::Adult:
+			case CState::Adult:
 				if (RandomBool(0.001))
 				{
 					auto* cc = newCreature();
@@ -131,11 +132,11 @@ void	Field::update() {
 		case CType::Slug:
 		{
 			auto func1 = [](Vec2 pos, Material* ct) {
-				if (ct->type != Material::Type::Leaf) return 0.0;
+				if (ct->type != MType::Leaf) return 0.0;
 				return 32.0 - (ct->pos - pos).length();
 			};
 			auto func2 = [](Vec2 pos, Creature* ct) {
-				if (ct->type != Creature::Type::Clematis || ct->state != Creature::State::Adult) return 0.0;
+				if (ct->type != CType::Clematis || ct->state != CState::Adult) return 0.0;
 				return 32.0 - (ct->pos - pos).length();
 			};
 			auto* mt = table.searchMaterial(c.pos, 32.0, func1);
@@ -147,7 +148,7 @@ void	Field::update() {
 
 					if (RandomBool(0.25))
 					{
-						if (c.state != Creature::State::Adult) c.state = Creature::State::Adult;
+						if (c.state != CState::Adult) c.state = CState::Adult;
 						else {
 							auto* cc = newCreature();
 							cc->pos = c.pos;
@@ -167,7 +168,7 @@ void	Field::update() {
 						for (int i = 0; i < n; i++) {
 							auto* m = newMaterial();
 							m->pos = ct->pos;
-							m->type = Material::Type::Leaf;
+							m->type = MType::Leaf;
 							m->vy = 2.0;
 							m->v = RandomVec2(1.0);
 						}
@@ -185,11 +186,11 @@ void	Field::update() {
 		case CType::Cricket:
 		{
 			auto func1 = [](Vec2 pos, Material* ct) {
-				if (ct->type != Material::Type::Meat) return 0.0;
+				if (ct->type != MType::Meat) return 0.0;
 				return 128.0 - (ct->pos - pos).length();
 			};
 			auto func2 = [](Vec2 pos, Creature* ct) {
-				if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
+				if (ct->type != CType::Slug || ct->state != CState::Adult) return 0.0;
 				return 128.0 - (ct->pos - pos).length();
 			};
 
@@ -220,7 +221,7 @@ void	Field::update() {
 							{
 								auto* m = newMaterial();
 								m->pos = ct->pos;
-								m->type = Material::Type::Meat;
+								m->type = MType::Meat;
 								m->vy = 1.0;
 								m->v = RandomVec2(0.5);
 							}
@@ -292,11 +293,11 @@ void	Field::update() {
 		m.pos += m.v;
 
 		if (m.age > 600) {
-			if (m.type == Material::Type::Fertilizer) m.erase();
+			if (m.type == MType::Fertilizer) m.erase();
 			else if (RandomBool(0.5)) m.erase();
 			else {
 				m.age = 0;
-				m.type = Material::Type::Fertilizer;
+				m.type = MType::Fertilizer;
 			}
 		}
 	}
@@ -337,9 +338,9 @@ void	Field::draw() const {
 
 	for (auto& c : creatures) {
 		if (!c.enabled) continue;
-		if (c.type == Creature::Type::Cricket) {
+		if (c.type == CType::Cricket) {
 			auto func = [](Vec2 pos, Creature* ct) {
-				if (ct->type != Creature::Type::Slug || ct->state != Creature::State::Adult) return 0.0;
+				if (ct->type != CType::Slug || ct->state != CState::Adult) return 0.0;
 				return 128.0 - (ct->pos - pos).length();
 			};
 			Circle(c.pos, 128.0).draw(Color(Palette::Red, 64));
@@ -362,13 +363,13 @@ void	Field::draw() const {
 		case CType::Clematis:
 			switch (c.state)
 			{
-			case Creature::State::Seed:
+			case CState::Seed:
 				assets->texture(L"clematisSeed.png").resize(c.size(), c.size()).drawAt(p);
 				break;
-			case Creature::State::Child:
+			case CState::Child:
 				assets->texture(L"clematisLeaf.png").resize(c.size(), c.size()).drawAt(p);
 				break;
-			case Creature::State::Adult:
+			case CState::Adult:
 				assets->texture(L"clematisLeaf.png").resize(c.size(), c.size()).drawAt(p);
 				assets->texture(L"clematisFlower.png").resize(c.size(), c.size()).drawAt(p);
 				break;
@@ -377,13 +378,13 @@ void	Field::draw() const {
 		case CType::Slug:
 			switch (c.state)
 			{
-			case Creature::State::Egg:
+			case CState::Egg:
 				assets->texture(L"slugEgg.png").resize(c.size(), c.size()).drawAt(p);
 				break;
-			case Creature::State::Child:
+			case CState::Child:
 				assets->texture(L"slugChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 				break;
-			case Creature::State::Adult:
+			case CState::Adult:
 				assets->texture(L"slugAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 				break;
 			}
@@ -391,13 +392,13 @@ void	Field::draw() const {
 		case CType::Cricket:
 			switch (c.state)
 			{
-			case Creature::State::Egg:
+			case CState::Egg:
 				assets->texture(L"cricketEgg.png").resize(c.size(), c.size()).drawAt(p);
 				break;
-			case Creature::State::Child:
+			case CState::Child:
 				assets->texture(L"cricketChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 				break;
-			case Creature::State::Adult:
+			case CState::Adult:
 				assets->texture(L"cricketAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 				break;
 			}
@@ -420,13 +421,13 @@ void	Field::draw() const {
 
 		switch (m.type)
 		{
-		case Material::Type::Meat:
+		case MType::Meat:
 			assets->texture(L"meat.png").resize(8.0, 8.0).drawAt(p);
 			break;
-		case Material::Type::Leaf:
+		case MType::Leaf:
 			assets->texture(L"leaf.png").resize(8.0, 8.0).drawAt(p);
 			break;
-		case Material::Type::Fertilizer:
+		case MType::Fertilizer:
 			assets->texture(L"fertilizer.png").resize(8.0, 8.0).drawAt(p);
 			break;
 		default:
