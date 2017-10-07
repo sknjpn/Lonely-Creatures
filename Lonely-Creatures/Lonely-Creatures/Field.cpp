@@ -70,7 +70,12 @@ void	Field::update() {
 			switch (c.state)
 			{
 			case CState::Seed:
-				if (c.age > 300) {
+				if (c.timer > 360) {
+					c.erase();
+					continue;
+				}
+				if (c.timer > 120)
+				{
 					//‰h—{‚Ì‹zŽû
 					auto func = [](Vec2 pos, Material* mt) {
 						if (mt->type != MType::Fertilizer) return 0.0;
@@ -78,17 +83,25 @@ void	Field::update() {
 					};
 					auto* mt = table.searchMaterial(c.pos, 64.0, func);
 					if (mt != nullptr) {
-						mt->erase();
-						c.state = CState::Child;
-					}
-					else {
-						c.erase();
-						continue;
+						mt->v += (c.pos - mt->pos).normalized()*0.01;
+						if ((c.pos - mt->pos).length() < (c.size() + mt->size()) / 2.0)
+						{
+							mt->erase();
+							c.state = CState::Child;
+							c.timer = 0;
+						}
 					}
 				}
 				break;
 			case CState::Child:
-				if (c.age > 600) {
+				if (c.timer > 360) {
+					c.addMaterial(MType::Fertilizer, 0.5);
+
+					c.erase();
+					continue;
+				}
+				if (c.timer > 120)
+				{
 					//‰h—{‚Ì‹zŽû
 					auto func = [](Vec2 pos, Material* mt) {
 						if (mt->type != MType::Fertilizer) return 0.0;
@@ -96,18 +109,18 @@ void	Field::update() {
 					};
 					auto* mt = table.searchMaterial(c.pos, 64.0, func);
 					if (mt != nullptr) {
-						mt->erase();
-						c.state = CState::Adult;
-					}
-					else {
-						c.addMaterial(MType::Fertilizer, 0.5);
-						c.erase();
-						continue;
+						mt->v += (c.pos - mt->pos).normalized()*0.01;
+						if ((c.pos - mt->pos).length() < (c.size() + mt->size()) / 2.0)
+						{
+							mt->erase();
+							c.state = CState::Adult;
+							c.timer = 0;
+						}
 					}
 				}
 				break;
 			case CState::Adult:
-				if (c.age > 1200) {
+				if (c.timer > 240) {
 					int n = Random(2, 3);
 					for (int i = 0; i < n; i++) {
 						auto* cc = newCreature(CType::Clematis, CState::Seed, c.pos);
@@ -245,6 +258,7 @@ void	Field::update() {
 
 		//ƒJƒEƒ“ƒ^
 		++c.age;
+		++c.timer;
 
 		//‰^“®ˆ—
 		c.vy -= 0.2;

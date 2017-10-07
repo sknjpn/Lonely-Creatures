@@ -57,13 +57,18 @@ struct Object {
 //生物オブジェクト
 struct Creature : Object {
 
+	int		timer;
 	int		health;
 	CType	type;
 	CState	state;
 
 	static int	numEnabled;
 
-	Creature() { Creature::numEnabled++; }
+	Creature()
+		: timer(0)
+	{
+		Creature::numEnabled++; 
+	}
 
 	int		maxHealth() const;
 	double	size() const;
