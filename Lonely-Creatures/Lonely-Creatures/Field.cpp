@@ -109,16 +109,19 @@ Field::Field(Assets* _assets)
 		auto* c = newCreature();
 		c->pos = RandomVec2(region);
 		c->type = CType::Clematis;
+		c->state = CState::Seed;
 	}
 	for (int i = 0; i < 128; i++) {
 		auto* c = newCreature();
 		c->pos = RandomVec2(region);
 		c->type = CType::Slug;
+		c->state = CState::Egg;
 	}
 	for (int i = 0; i < 16; i++) {
 		auto* c = newCreature();
 		c->pos = RandomVec2(region);
 		c->type = CType::Cricket;
+		c->state = CState::Egg;
 	}
 }
 void	Field::update() {
@@ -130,6 +133,9 @@ void	Field::update() {
 		case CType::Clematis:
 			switch (c.state)
 			{
+			case CState::Seed:
+				c.state = CState::Child;
+				break;
 			case CState::Child:
 				if (RandomBool(0.001)) c.state = CState::Adult;
 				break;
@@ -147,6 +153,19 @@ void	Field::update() {
 			break;
 		case CType::Slug:
 		{
+			switch (c.state)
+			{
+			case CState::Egg:
+				c.state = CState::Child;
+				break;
+			case CState::Child:
+				break;
+			case CState::Adult:
+				break;
+
+			default:
+				break;
+			}
 			auto func1 = [](Vec2 pos, Material* ct) {
 				if (ct->type != MType::Leaf) return 0.0;
 				return 32.0 - (ct->pos - pos).length();
@@ -201,6 +220,19 @@ void	Field::update() {
 		break;
 		case CType::Cricket:
 		{
+			switch (c.state)
+			{
+			case CState::Egg:
+				c.state = CState::Child;
+				break;
+			case CState::Child:
+				break;
+			case CState::Adult:
+				break;
+
+			default:
+				break;
+			}
 			auto func1 = [](Vec2 pos, Material* ct) {
 				if (ct->type != MType::Meat) return 0.0;
 				return 128.0 - (ct->pos - pos).length();
@@ -412,8 +444,12 @@ void	Field::draw() const {
 				assets->texture(L"cricketEgg.png").resize(c.size(), c.size()).drawAt(p);
 				break;
 			case CState::Child:
-				assets->texture(L"cricketChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
-				break;
+			{
+				auto t = assets->texture(L"cricketAdult.png")(48 * (c.age % 4), 0, 48, 48);
+				t.resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+			}
+			//assets->texture(L"cricketChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+			break;
 			case CState::Adult:
 				assets->texture(L"cricketAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 				break;
