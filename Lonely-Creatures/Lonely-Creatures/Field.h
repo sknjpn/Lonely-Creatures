@@ -44,6 +44,8 @@ struct Creature : Object {
 	};
 
 	enum struct State {
+		Egg,
+		Seed,
 		Child,
 		Adult,
 	};

@@ -62,12 +62,26 @@ double	Creature::size() const {
 	switch (type)
 	{
 	case Type::Clematis:
-		if (state == State::Adult) return 16.0;
-		else return 8.0;
+		switch (state)
+		{
+		case Creature::State::Seed:	return 2.0;
+		case Creature::State::Child:return 8.0;
+		case Creature::State::Adult:return 16.0;
+		}
 	case Type::Slug:
-		if (state == State::Adult) return 18.0;
-		else return 8.0;
-	case Type::Cricket:	return 32.0;
+		switch (state)
+		{
+		case Creature::State::Egg:	return 3.0;
+		case Creature::State::Child:return 12.0;
+		case Creature::State::Adult:return 8.0;
+		}
+	case Type::Cricket:
+		switch (state)
+		{
+		case Creature::State::Egg:	return 4.0;
+		case Creature::State::Child:return 16.0;
+		case Creature::State::Adult:return 32.0;
+		}
 	default: return 16.0;
 	}
 }
@@ -346,20 +360,47 @@ void	Field::draw() const {
 		switch (c.type)
 		{
 		case CType::Clematis:
-			assets->texture(L"clematisLeaf.png").resize(c.size(), c.size()).drawAt(p);
-			if (c.state == Creature::State::Adult) assets->texture(L"clematisFlower.png").resize(c.size(), c.size()).drawAt(p);
+			switch (c.state)
+			{
+			case Creature::State::Seed:
+				assets->texture(L"clematisSeed.png").resize(c.size(), c.size()).drawAt(p);
+				break;
+			case Creature::State::Child:
+				assets->texture(L"clematisLeaf.png").resize(c.size(), c.size()).drawAt(p);
+				break;
+			case Creature::State::Adult:
+				assets->texture(L"clematisLeaf.png").resize(c.size(), c.size()).drawAt(p);
+				assets->texture(L"clematisFlower.png").resize(c.size(), c.size()).drawAt(p);
+				break;
+			}
 			break;
 		case CType::Slug:
-			if (c.state == Creature::State::Adult) {
-				if (c.vy > 0.0) assets->texture(L"slugAdultDamaged.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
-				else assets->texture(L"slugAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+			switch (c.state)
+			{
+			case Creature::State::Egg:
+				assets->texture(L"slugEgg.png").resize(c.size(), c.size()).drawAt(p);
+				break;
+			case Creature::State::Child:
+				assets->texture(L"slugChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+				break;
+			case Creature::State::Adult:
+				assets->texture(L"slugAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+				break;
 			}
-			else assets->texture(L"slugChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
 			break;
 		case CType::Cricket:
-			assets->texture(L"cricket.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
-			break;
-		default:
+			switch (c.state)
+			{
+			case Creature::State::Egg:
+				assets->texture(L"cricketEgg.png").resize(c.size(), c.size()).drawAt(p);
+				break;
+			case Creature::State::Child:
+				assets->texture(L"cricketChild.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+				break;
+			case Creature::State::Adult:
+				assets->texture(L"cricketAdult.png").resize(c.size(), c.size()).rotate(angleAsRadian).drawAt(p);
+				break;
+			}
 			break;
 		}
 	}
