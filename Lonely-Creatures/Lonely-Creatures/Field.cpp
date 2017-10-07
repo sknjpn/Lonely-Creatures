@@ -9,13 +9,13 @@ Assets*	Object::assets;
 
 void	Material::erase() {
 	eraseFlag = true;
-	isSigned = false;
+	registered = false;
 	auto* c = field->table.chip(pos);
 	if (c != nullptr) c->remove(this);
 }
 void	Creature::erase() {
 	eraseFlag = true;
-	isSigned = false;
+	registered = false;
 	auto* c = field->table.chip(pos);
 	if (c != nullptr) c->remove(this);
 }
@@ -220,7 +220,7 @@ void	Field::update() {
 		if ((region.pos - c.pos).x > c.v.x)  c.v.x = (region.pos - c.pos).x;
 		if ((region.pos - c.pos).y > c.v.y)  c.v.y = (region.pos - c.pos).y;
 
-		if (!c.isSigned || table.chip(c.pos) != table.chip(c.pos += c.v)) {
+		if (!c.registered || table.chip(c.pos) != table.chip(c.pos += c.v)) {
 			table.chip(c.pos)->remove(&c);
 			table.chip(c.pos + c.v)->set(&c);
 		}
@@ -243,7 +243,7 @@ void	Field::update() {
 		if ((region.pos - m.pos).x > m.v.x)  m.v.x = (region.pos - m.pos).x;
 		if ((region.pos - m.pos).y > m.v.y)  m.v.y = (region.pos - m.pos).y;
 
-		if (!m.isSigned || table.chip(m.pos) != table.chip(m.pos += m.v)) {
+		if (!m.registered || table.chip(m.pos) != table.chip(m.pos += m.v)) {
 			table.chip(m.pos)->remove(&m);
 			table.chip(m.pos + m.v)->set(&m);
 		}

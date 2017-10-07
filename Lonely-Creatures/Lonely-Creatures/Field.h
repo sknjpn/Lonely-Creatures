@@ -11,7 +11,7 @@ struct Object {
 		Material,
 	};
 
-	bool	isSigned;
+	bool	registered;
 	bool	eraseFlag;
 	Type	type;
 	double	y;
@@ -24,7 +24,7 @@ struct Object {
 	static	Assets*	assets;
 
 	Object() 
-		: isSigned(false)
+		: registered(false)
 		, eraseFlag(false)
 	{}
 	Vec2	drawPos() const {
