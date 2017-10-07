@@ -7,14 +7,18 @@ typedef Creature::State CState;
 
 Field*	Object::field;
 Assets*	Object::assets;
+int		Creature::numEnabled = 0;
+int		Material::numEnabled = 0;
 
 void	Material::erase() {
+	numEnabled--;
 	enabled = false;
 	registered = false;
 	auto* c = field->table.chip(pos);
 	if (c != nullptr) c->remove(this);
 }
 void	Creature::erase() {
+	numEnabled--;
 	enabled = false;
 	registered = false;
 	auto* c = field->table.chip(pos);
@@ -302,7 +306,7 @@ void	Field::update() {
 		}
 	}
 
-	
+
 	while (!materials.isEmpty() && !materials.back().enabled) materials.pop_back();
 	while (!creatures.isEmpty() && !creatures.back().enabled) creatures.pop_back();
 }

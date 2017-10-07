@@ -27,6 +27,8 @@ void	Game::update() {
 		else if (playSpeed > 0 && playSpeed <= 64) playSpeed *= 2;
 	}
 	Print << L"実行速度を変更するには、F1キー、もしくはF2キーを使ってください。" << L"実行速度 = " << playSpeed;
+	Print << L"生物数 = " << Creature::numEnabled;
+	Print << L"マテリアル数 = " << Material::numEnabled;
 
 	camera.update();
 

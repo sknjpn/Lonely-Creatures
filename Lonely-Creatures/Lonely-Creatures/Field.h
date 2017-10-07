@@ -61,6 +61,8 @@ struct Creature : Object {
 	State	state;
 	Gender	gender;
 
+	static int	numEnabled;
+
 	Creature();
 	Creature(const Vec2& _pos, const Type& _type);
 
@@ -80,6 +82,8 @@ struct Material : Object {
 	};
 
 	Type	type;
+
+	static int	numEnabled;
 
 	Material();
 	Material(const Vec2& _pos, const Type& _type);
@@ -128,6 +132,7 @@ struct Field {
 	void	update();
 	void	draw() const;
 	Creature*	newCreature() {
+		Creature::numEnabled++;
 		for (auto& c : creatures) {
 			if (!c.enabled) {
 				c = Creature();	//リセット;
@@ -137,6 +142,7 @@ struct Field {
 		return &creatures.emplace_back();
 	}
 	Material*	newMaterial() {
+		Material::numEnabled++;
 		for (auto& m : materials) {
 			if (!m.enabled) {
 				m = Material();	//リセット;
