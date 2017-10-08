@@ -60,6 +60,7 @@ struct Object {
 //生物オブジェクト
 struct Creature : Object {
 
+	int		mCount;	//マテリアル系
 	int		timer;
 	int		health;
 	CType	type;
@@ -69,6 +70,7 @@ struct Creature : Object {
 
 	Creature()
 		: timer(0)
+		, mCount(0)
 	{
 		Creature::numEnabled++; 
 	}
@@ -158,4 +160,6 @@ struct Field {
 	Creature*	newCreature(CType _type, CState _state);
 	Material*	newMaterial(MType _type, const Vec2& _pos);
 	Material*	newMaterial(MType _type);
+
+	void	updateClematis(Creature* _c);
 };

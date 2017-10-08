@@ -188,6 +188,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Table.cpp" />
+    <ClCompile Include="updateClematis.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="engine\texture\box-shadow\128.png" />

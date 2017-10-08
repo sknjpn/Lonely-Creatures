@@ -16,7 +16,7 @@ double	Creature::size() const {
 	case CType::Clematis:
 		switch (state)
 		{
-		case CState::Seed:	return 4.0;
+		case CState::Seed:	return 2.0;
 		case CState::Child:	return 8.0;
 		case CState::Adult:	return 16.0;
 		}
@@ -68,72 +68,7 @@ void	Field::update() {
 
 		switch (c.type) {
 		case CType::Clematis:
-			switch (c.state)
-			{
-			case CState::Seed:
-				if (c.timer > 360) {
-					c.erase();
-					continue;
-				}
-				if (c.timer > 120 && c.timer % 5 == 0)
-				{
-					//‰h—{‚Ì‹zŽû
-					auto func = [](Vec2 pos, Material* mt) {
-						if (mt->type != MType::Fertilizer) return 0.0;
-						return 64.0 - (mt->pos - pos).length();
-					};
-					auto* mt = table.searchMaterial(c.pos, 64.0, func);
-					if (mt != nullptr) {
-						mt->v += (c.pos - mt->pos).normalized()*0.1;
-						if ((c.pos - mt->pos).length() < (c.size() + mt->size()) / 2.0)
-						{
-							mt->erase();
-							c.state = CState::Child;
-							c.timer = 0;
-						}
-					}
-				}
-				break;
-			case CState::Child:
-				if (c.timer > 360) {
-					c.addMaterial(MType::Fertilizer, 0.5);
-
-					c.erase();
-					continue;
-				}
-				if (c.timer > 120 && c.timer % 5 == 0)
-				{
-					//‰h—{‚Ì‹zŽû
-					auto func = [](Vec2 pos, Material* mt) {
-						if (mt->type != MType::Fertilizer) return 0.0;
-						return 64.0 - (mt->pos - pos).length();
-					};
-					auto* mt = table.searchMaterial(c.pos, 64.0, func);
-					if (mt != nullptr) {
-						mt->v += (c.pos - mt->pos).normalized()*0.1;
-						if ((c.pos - mt->pos).length() < (c.size() + mt->size()) / 2.0)
-						{
-							mt->erase();
-							c.state = CState::Adult;
-							c.timer = 0;
-						}
-					}
-				}
-				break;
-			case CState::Adult:
-				if (c.timer > 240) {
-					int n = Random(2, 3);
-					for (int i = 0; i < n; i++) {
-						auto* cc = newCreature(CType::Clematis, CState::Seed, c.pos);
-						cc->v = RandomVec2(1.0);
-						cc->vy = 2.0;
-					}
-					c.addMaterial(MType::Leaf, 0.25, 2);
-					c.erase();
-					continue;
-				}
-				break;
-			}
+			updateClematis(&c);
 			break;
 		case CType::Slug:
 		{
@@ -289,7 +224,7 @@ void	Field::update() {
 		case MType::Iron:
 			break;
 		case MType::Leaf:
-			if (m.age > 600) { m.type = MType::Fertilizer; m.age = 0; }
+			if (m.age > 60) { m.type = MType::Fertilizer; m.age = 0; }
 			break;
 		case MType::Meat:
 			if (m.age > 600) { m.type = MType::Fertilizer; m.age = 0; }
@@ -448,7 +383,7 @@ void	Field::draw() const {
 			assets->texture(L"meat.png").resize(size).drawAt(m.drawPos());
 			break;
 		case MType::Leaf:
-			assets->texture(L"leaf.png")(int(m.age / 150) * 32, 0, 32, 32).resize(size).drawAt(m.drawPos());
+			assets->texture(L"leaf.png")(int(m.age / 15) * 32, 0, 32, 32).resize(size).drawAt(m.drawPos());
 			break;
 		case MType::Fertilizer:
 			assets->texture(L"fertilizer.png").resize(size).drawAt(m.drawPos());
