@@ -30,6 +30,14 @@ void	Game::update() {
 	Print << L"¶•¨” = " << Creature::numEnabled;
 	Print << L"ƒ}ƒeƒŠƒAƒ‹” = " << Material::numEnabled;
 
+	//FullScreen
+	if (KeyF11.down())
+	{
+		if (Window::GetState().fullScreen) Graphics::SetFullScreen(false, Size(1280, 720));
+		else Graphics::SetFullScreen(true, Graphics::EnumOutputs().front().displayModes.back().size);
+		//System::Update();
+	}
+
 	camera.update();
 
 	for (int i = 0; i < playSpeed; i++) field.update();
