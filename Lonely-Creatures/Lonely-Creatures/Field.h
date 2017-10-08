@@ -49,8 +49,11 @@ struct Object {
 		, pos(Vec2::Zero())
 		, angle(RandomVec2())
 	{}
-	Vec2	drawPos() const {
+	virtual Vec2 drawPos() const {
 		return pos.movedBy(0, -y);
+	}
+	virtual	String name() const {
+		return L"Object";
 	}
 };
 
@@ -74,6 +77,15 @@ struct Creature : Object {
 	double	size() const;
 	void	erase();
 	void	addMaterial(MType _type, double _force = 0.0, int _num = 1);
+	String	name() const {
+		switch (type)
+		{
+		case CType::Clematis:	return L"Clematis";
+		case CType::Slug:		return L"Slug";
+		case CType::Cricket:	return L"Cricket";
+		default:	return L"Hoge";
+		}
+	}
 };
 
 //マテリアルオブジェクト
@@ -86,6 +98,19 @@ struct Material : Object {
 	Material() { Material::numEnabled++; }
 	double	size() const { return 4.0; }
 	void	erase();
+	String	name() const {
+		switch (type)
+		{
+		case MType::Fertilizer:	return L"Fertilizer";
+		case MType::Iron:		return L"Iron";
+		case MType::Leaf:		return L"Leaf";
+		case MType::Meat:		return L"Meat";
+		default:	return L"Hoge";
+		}
+	}
+	Vec2 drawPos() const {
+		return pos.movedBy(0, -y - 0.8 + 0.4*sin(age / 20.0));
+	}
 };
 
 struct Chip {
@@ -116,6 +141,7 @@ struct Table {
 //フィールド
 struct Field {
 
+	bool	drawHealthBar;
 	RectF	region;
 	Table	table;
 	Assets*	assets;

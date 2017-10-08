@@ -45,9 +45,9 @@ void Camera::update()
 	if ((useKeyViewControl && KeyD.pressed()) || Cursor::Pos().x >= Window::Size().x - 1) drawingRegion.pos.x += slidingSpeed;
 	if ((useKeyViewControl && KeyS.pressed()) || Cursor::Pos().y >= Window::Size().y - 1) drawingRegion.pos.y += slidingSpeed;
 }
-Transformer2D	Camera::createTransformer2D() const
+Transformer2D	Camera::createTransformer2D(double _magnification) const
 {
-	auto mat3x2 = Mat3x2::Translate(-smoothDrawingRegion.center()).scaled(Window::Size().y / smoothDrawingRegion.size.y).translated(Window::ClientRect().center());
+	auto mat3x2 = Mat3x2::Scale(_magnification).translated(-smoothDrawingRegion.center()).scaled(Window::Size().y / smoothDrawingRegion.size.y).translated(Window::ClientRect().center());
 
 	return Transformer2D(mat3x2, true);
 }

@@ -41,6 +41,8 @@ void	Game::update() {
 
 	camera.update();
 
+	if (KeyH.down()) field.drawHealthBar = !field.drawHealthBar;
+
 	for (int i = 0; i < playSpeed; i++) field.update();
 
 	if (MouseL.down())
@@ -63,6 +65,18 @@ void	Game::update() {
 		auto t = camera.createTransformer2D();
 
 		field.draw();
+	}
+	{
+		auto t = camera.createTransformer2D(1.0 / 16.0);
+
+		for (auto& c : field.creatures)
+		{
+			if (c.enabled) assets.font(32)(c.name()).drawAt(c.pos.movedBy(0, -c.size() / 2.0 - 1.6)*16.0);
+		}
+		for (auto& m : field.materials)
+		{
+			if (m.enabled) assets.font(32)(m.name()).drawAt(m.drawPos().movedBy(0, -m.size() / 2.0 - 1.6)*16.0);
+		}
 	}
 
 	if (display.selectedCreature != nullptr)

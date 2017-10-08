@@ -10,5 +10,5 @@ public:
 
 	Camera();
 	void	update();
-	Transformer2D	createTransformer2D() const;
+	Transformer2D	createTransformer2D(double _magnification = 1.0) const;
 };

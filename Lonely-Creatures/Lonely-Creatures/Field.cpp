@@ -39,6 +39,7 @@ double	Creature::size() const {
 }
 Field::Field(Assets* _assets)
 	: table(64.0, Size(64, 64))
+	, drawHealthBar(false)
 {
 
 	region = RectF(0, 0, 1024, 1024);
@@ -428,30 +429,29 @@ void	Field::draw() const {
 	}
 
 	//healthƒQ[ƒW
-	if (KeyH.pressed()) {
+	if (drawHealthBar) {
 		for (auto& c : creatures) {
 			if (!c.enabled) continue;
 			double rate = double(c.health) / double(c.maxHealth());
-			auto p = c.pos.movedBy(-c.size() / 2.0, -c.size() / 2.0);
-			Line(p, p.movedBy(c.size(), 0.0)).draw(2, Palette::Red);
-			Line(p, p.movedBy(c.size()*rate, 0.0)).draw(2, Palette::Green);
+			auto p = c.drawPos().movedBy(-c.size() / 2.0, -c.size() / 2.0);
+			Line(p, p.movedBy(c.size(), 0.0)).draw(1.0, Palette::Red);
+			Line(p, p.movedBy(c.size()*rate, 0.0)).draw(1.0, Palette::Green);
 		}
 	}
 
 	for (auto& m : materials) {
 		if (!m.enabled) continue;
-		const Vec2& p = m.pos.movedBy(0, -m.y - 0.8 + 0.4*sin(m.age / 20.0));
 		const Vec2& size = { m.size(), m.size() };
 		switch (m.type)
 		{
 		case MType::Meat:
-			assets->texture(L"meat.png").resize(size).drawAt(p);
+			assets->texture(L"meat.png").resize(size).drawAt(m.drawPos());
 			break;
 		case MType::Leaf:
-			assets->texture(L"leaf.png")(int(m.age / 150) * 32, 0, 32, 32).resize(size).drawAt(p);
+			assets->texture(L"leaf.png")(int(m.age / 150) * 32, 0, 32, 32).resize(size).drawAt(m.drawPos());
 			break;
 		case MType::Fertilizer:
-			assets->texture(L"fertilizer.png").resize(size).drawAt(p);
+			assets->texture(L"fertilizer.png").resize(size).drawAt(m.drawPos());
 			break;
 		default:
 			break;
