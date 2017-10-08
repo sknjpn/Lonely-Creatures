@@ -26,6 +26,7 @@ void	Game::update() {
 		if (playSpeed == 0) playSpeed = 1;
 		else if (playSpeed > 0 && playSpeed <= 64) playSpeed *= 2;
 	}
+	Print << L"フルスクリーンにするにはF11キー、ヘルスバーを表示するにはHキーをおしてください。";
 	Print << L"実行速度を変更するには、F1キー、もしくはF2キーを使ってください。" << L"実行速度 = " << playSpeed;
 	Print << L"生物数 = " << Creature::numEnabled;
 	Print << L"マテリアル数 = " << Material::numEnabled;
