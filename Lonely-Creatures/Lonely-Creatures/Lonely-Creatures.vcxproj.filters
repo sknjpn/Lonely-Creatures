@@ -90,6 +90,9 @@
     <ClCompile Include="updateClematis.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="updateSlug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Icon.ico">

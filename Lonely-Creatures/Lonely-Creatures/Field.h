@@ -162,4 +162,5 @@ struct Field {
 	Material*	newMaterial(MType _type);
 
 	void	updateClematis(Creature* _c);
+	void	updateSlug(Creature* _c);
 };

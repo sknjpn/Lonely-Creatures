@@ -25,7 +25,7 @@ double	Creature::size() const {
 		{
 		case CState::Egg:	return 6.0;
 		case CState::Child:	return 8.0;
-		case CState::Adult:	return 12.0;
+		case CState::Adult:	return 8.0;
 		}
 	case CType::Cricket:
 		switch (state)
@@ -55,9 +55,9 @@ Field::Field(Assets* _assets)
 
 	for (int i = 0; i < 1024; i++) newCreature(CType::Clematis, CState::Seed);
 	for (int i = 0; i < 2048; i++) newMaterial(MType::Fertilizer);
-	/*
-	for (int i = 0; i < 128; i++) newCreature(CType::Slug, CState::Egg);
-	for (int i = 0; i < 16; i++) newCreature(CType::Cricket, CState::Egg);
+	
+	for (int i = 0; i < 64; i++) newCreature(CType::Slug, CState::Egg);
+	/*for (int i = 0; i < 16; i++) newCreature(CType::Cricket, CState::Egg);
 
 	*/
 }
@@ -71,61 +71,8 @@ void	Field::update() {
 			updateClematis(&c);
 			break;
 		case CType::Slug:
-		{
-			switch (c.state)
-			{
-			case CState::Egg:
-				if (c.age > 300) c.state = CState::Child;
-				break;
-			case CState::Child:
-				if (c.age > 420) c.state = CState::Adult;
-				break;
-			case CState::Adult:
-			{
-				if (c.age > 1200) {
-					int n = Random(2, 3);
-					for (int i = 0; i < n; i++) newCreature(CType::Slug, CState::Egg);
-					c.erase();
-					continue;
-				}
-				//行動
-				auto func1 = [](Vec2 pos, Material* ct) {
-					if (ct->type != MType::Leaf) return 0.0;
-					return 32.0 - (ct->pos - pos).length();
-				};
-				auto func2 = [](Vec2 pos, Creature* ct) {
-					if (ct->type != CType::Clematis || ct->state != CState::Adult) return 0.0;
-					return 32.0 - (ct->pos - pos).length();
-				};
-				auto* mt = table.searchMaterial(c.pos, 32.0, func1);
-				if (mt != nullptr) {
-					c.angle = (mt->pos - c.pos).normalized();
-					if ((mt->pos - c.pos).length() < c.size() / 2.0 + 4.0) {
-						mt->erase();
-					}
-				}
-				else
-				{
-					auto* ct = table.searchCreature(c.pos, 32.0, func2);
-					if (ct != nullptr) {
-						c.angle = (ct->pos - c.pos).normalized();
-						if ((ct->pos - c.pos).length() < (c.size() + ct->size()) / 2.0) {
-							//葉っぱのドロップ
-							ct->addMaterial(MType::Leaf, 1.0, Random(1, 3));
-
-							ct->erase();
-						}
-					}
-					else {
-						if (RandomBool(0.01)) c.angle = RandomVec2();
-					}
-				}
-				c.v += c.angle*0.02;
-				break;
-			}
-			}
-		}
-		break;
+			updateSlug(&c);
+			break;
 		case CType::Cricket:
 		{
 			switch (c.state)
@@ -200,7 +147,7 @@ void	Field::update() {
 		c.vy -= 0.2;
 		c.y += c.vy;
 		if (c.y <= 0) { c.y = 0; c.vy = 0; }
-		c.v /= 1.05;
+		c.v /= 1.1;
 		if ((region.br() - c.pos).x < c.v.x) c.v.x = (region.br() - c.pos).x;
 		if ((region.br() - c.pos).y < c.v.y) c.v.y = (region.br() - c.pos).y;
 		if ((region.pos - c.pos).x > c.v.x)  c.v.x = (region.pos - c.pos).x;
@@ -210,8 +157,6 @@ void	Field::update() {
 			table.chip(c.pos + c.v)->set(&c);
 		}
 		c.pos += c.v;
-
-		if (c.age > 2400) { c.erase(); continue; }
 	}
 
 	for (auto& m : materials) {
@@ -224,7 +169,7 @@ void	Field::update() {
 		case MType::Iron:
 			break;
 		case MType::Leaf:
-			if (m.age > 60) { m.type = MType::Fertilizer; m.age = 0; }
+			if (m.age > 600) { m.type = MType::Fertilizer; m.age = 0; }
 			break;
 		case MType::Meat:
 			if (m.age > 600) { m.type = MType::Fertilizer; m.age = 0; }
@@ -243,7 +188,7 @@ void	Field::update() {
 			m.y = 0;
 			m.vy = 0;
 		}
-		m.v /= 1.05;
+		m.v /= 1.1;
 		if ((region.br() - m.pos).x < m.v.x) m.v.x = (region.br() - m.pos).x;
 		if ((region.br() - m.pos).y < m.v.y) m.v.y = (region.br() - m.pos).y;
 		if ((region.pos - m.pos).x > m.v.x)  m.v.x = (region.pos - m.pos).x;
@@ -383,7 +328,7 @@ void	Field::draw() const {
 			assets->texture(L"meat.png").resize(size).drawAt(m.drawPos());
 			break;
 		case MType::Leaf:
-			assets->texture(L"leaf.png")(int(m.age / 15) * 32, 0, 32, 32).resize(size).drawAt(m.drawPos());
+			assets->texture(L"leaf.png")(int(m.age / 150) * 32, 0, 32, 32).resize(size).drawAt(m.drawPos());
 			break;
 		case MType::Fertilizer:
 			assets->texture(L"fertilizer.png").resize(size).drawAt(m.drawPos());

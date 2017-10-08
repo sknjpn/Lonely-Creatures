@@ -189,6 +189,7 @@
     </ClCompile>
     <ClCompile Include="Table.cpp" />
     <ClCompile Include="updateClematis.cpp" />
+    <ClCompile Include="updateSlug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="engine\texture\box-shadow\128.png" />
