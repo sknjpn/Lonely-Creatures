@@ -89,7 +89,7 @@ void	Game::update() {
 	{
 		auto t = camera.createTransformer2D();
 		auto* sc = display.selectedCreature;
-		Circle(sc->drawPos(), sc->size() / 2.0).draw(Color(Palette::Skyblue, 96)).drawFrame(1, Palette::Black);
+		Circle(sc->drawPos(), sc->size() / 2.0).draw(Color(Palette::Skyblue, 96)).drawFrame(sc->size() / 20.0, Palette::Black);
 		camera.gazePoint = sc->pos;
 	}
 	else
@@ -99,7 +99,7 @@ void	Game::update() {
 		{
 			if (Circle(c.drawPos(), c.size() / 2.0).intersects(Cursor::PosF()))
 			{
-				Circle(c.drawPos(), c.size() / 2.0).drawFrame(1, Palette::Black);
+				Circle(c.drawPos(), c.size() / 2.0).drawFrame(c.size() / 20.0, Palette::Black);
 				break;
 			}
 		}
