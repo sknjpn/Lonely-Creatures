@@ -54,7 +54,7 @@ void	Game::update() {
 
 		for (auto& c : field.creatures)
 		{
-			if (Circle(c.pos, c.size() / 2.0).intersects(Cursor::PosF()))
+			if (c.enabled && Circle(c.pos, c.size() / 2.0).intersects(Cursor::PosF()))
 			{
 				display.selectedCreature = &c;
 				break;
@@ -70,7 +70,7 @@ void	Game::update() {
 
 	if (KeyF.down()) drawObjectName = !drawObjectName;
 
-	if(drawObjectName)
+	if (drawObjectName)
 	{
 		auto t = camera.createTransformer2D(1.0 / 16.0);
 
@@ -84,6 +84,7 @@ void	Game::update() {
 		}
 	}
 
+	if (display.selectedCreature != nullptr && !display.selectedCreature->enabled) display.selectedCreature = nullptr;
 	if (display.selectedCreature != nullptr)
 	{
 		auto t = camera.createTransformer2D();

@@ -25,7 +25,7 @@ double	Creature::size() const {
 		{
 		case CState::Egg:	return 6.0;
 		case CState::Child:	return 8.0;
-		case CState::Adult:	return 8.0;
+		case CState::Adult:	return 6.0;
 		}
 	case CType::Cricket:
 		switch (state)

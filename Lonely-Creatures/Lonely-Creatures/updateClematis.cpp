@@ -36,7 +36,7 @@ void	Field::updateClematis(Creature* _c) {
 		break;
 	case CState::Child:
 		if (_c->timer > 360) {
-			_c->addMaterial(MType::Leaf, 0.5, _c->mCount);
+			_c->addMaterial(MType::Leaf, 1.0, _c->mCount);
 			_c->erase();
 			return;
 		}
@@ -66,7 +66,7 @@ void	Field::updateClematis(Creature* _c) {
 				cc->v = RandomVec2(1.0);
 				cc->vy = 2.0;
 			}
-			_c->addMaterial(MType::Leaf, 0.5, _c->mCount);
+			_c->addMaterial(MType::Leaf, 1.0, _c->mCount);
 			_c->erase();
 			return;
 		}
