@@ -29,8 +29,8 @@ void	Game::update() {
 	}
 	Print << L"フルスクリーンにするにはF11キー、ヘルスバーを表示するにはHキーをおしてください。";
 	Print << L"実行速度を変更するには、F1キー、もしくはF2キーを使ってください。" << L"実行速度 = " << playSpeed;
-	Print << L"生物数 = " << Creature::numEnabled;
-	Print << L"マテリアル数 = " << Material::numEnabled;
+	Print << L"生物数:" << Creature::numEnabled << L" メモリ効率:" << int(Creature::numEnabled*100.0 / (double)field.creatures.size()) << L"%";
+	Print << L"マテリアル数:" << Material::numEnabled << L" メモリ効率:" << int(Creature::numEnabled*100.0 / (double)field.creatures.size()) << L"%";
 
 	//FullScreen
 	if (KeyF11.down())
