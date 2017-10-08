@@ -23,7 +23,7 @@ double	Creature::size() const {
 	case CType::Slug:
 		switch (state)
 		{
-		case CState::Egg:	return 6.0;
+		case CState::Egg:	return 3.0;
 		case CState::Child:	return 8.0;
 		case CState::Adult:	return 6.0;
 		}
