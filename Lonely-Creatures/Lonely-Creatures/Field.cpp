@@ -75,7 +75,7 @@ void	Field::update() {
 					c.erase();
 					continue;
 				}
-				if (c.timer > 120)
+				if (c.timer > 120 && c.timer % 5 == 0)
 				{
 					//‰h—{‚Ì‹zŽû
 					auto func = [](Vec2 pos, Material* mt) {
@@ -84,7 +84,7 @@ void	Field::update() {
 					};
 					auto* mt = table.searchMaterial(c.pos, 64.0, func);
 					if (mt != nullptr) {
-						mt->v += (c.pos - mt->pos).normalized()*0.01;
+						mt->v += (c.pos - mt->pos).normalized()*0.1;
 						if ((c.pos - mt->pos).length() < (c.size() + mt->size()) / 2.0)
 						{
 							mt->erase();
@@ -101,7 +101,7 @@ void	Field::update() {
 					c.erase();
 					continue;
 				}
-				if (c.timer > 120)
+				if (c.timer > 120 && c.timer % 5 == 0)
 				{
 					//‰h—{‚Ì‹zŽû
 					auto func = [](Vec2 pos, Material* mt) {
@@ -110,7 +110,7 @@ void	Field::update() {
 					};
 					auto* mt = table.searchMaterial(c.pos, 64.0, func);
 					if (mt != nullptr) {
-						mt->v += (c.pos - mt->pos).normalized()*0.01;
+						mt->v += (c.pos - mt->pos).normalized()*0.1;
 						if ((c.pos - mt->pos).length() < (c.size() + mt->size()) / 2.0)
 						{
 							mt->erase();
