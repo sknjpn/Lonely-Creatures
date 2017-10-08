@@ -4,6 +4,7 @@ Game::Game()
 	: field(&assets)
 	, display(&assets)
 	, playSpeed(1)
+	, drawObjectName(false)
 {
 
 	Window::SetTitle(L"Lonely Creatures");
@@ -66,6 +67,10 @@ void	Game::update() {
 
 		field.draw();
 	}
+
+	if (KeyF.down()) drawObjectName = !drawObjectName;
+
+	if(drawObjectName)
 	{
 		auto t = camera.createTransformer2D(1.0 / 16.0);
 

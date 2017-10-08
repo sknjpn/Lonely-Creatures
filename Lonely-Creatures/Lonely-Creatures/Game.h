@@ -13,6 +13,7 @@ public:
 	Camera	camera;
 	Display	display;
 	int		playSpeed;
+	bool	drawObjectName;
 
 	Game();
 
