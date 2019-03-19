@@ -615,5 +615,7 @@ tags
 
 ### Lonely Creatures
 *_log.html
+*.exe
 /Lonely-Creatures/Lonely-Creatures/Intermediate/Release-x64
 /Lonely-Creatures/Lonely-Creatures/Release-x64
+/Intermediate
